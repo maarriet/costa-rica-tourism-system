@@ -1,0 +1,29 @@
+﻿.hero-section {
+    background: url('/images/costa-rica-hero.jpg') center center/cover no-repeat;
+    height: 400px;
+    position: relative;
+}
+
+    .hero-section .overlay {
+        background-color: rgba(0, 128, 0, 0.6);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .hero-section h1 {
+        font-size: 3rem;
+        font-weight: bold;
+    }
+
+    .hero-section p {
+        font-size: 1.5rem;
+    }
+
+.card img {
+    height: 200px;
+    object-fit: cover;
+}
+

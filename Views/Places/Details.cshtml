@@ -1,0 +1,178 @@
+﻿@model PlaceViewModel
+@{
+    ViewData["Title"] = $"Detalles - {Model.Name}";
+
+    string GetStatusClass(string status) => status?.ToUpper() switch
+    {
+        "AVAILABLE" => "status-available",
+        "OCCUPIED" => "status-busy",
+        "MAINTENANCE" => "status-maintenance",
+        _ => "status-inactive"
+    };
+}
+
+@section Styles {
+    <link href="~/css/styles.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+}
+
+<div class="container">
+    <div class="section-header">
+        <h2><i class="fas fa-eye"></i> Detalles del Lugar</h2>
+        <div class="section-actions">
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">
+                <i class="fas fa-edit"></i> Editar
+            </a>
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Volver a Lista
+            </a>
+        </div>
+    </div>
+
+    <div class="details-container">
+        <!-- Main Information Card -->
+        <div class="details-card main-info">
+            <div class="card-header">
+                <div class="place-title">
+                    <h1>@Model.Name</h1>
+                    <span class="place-code">@Model.Code</span>
+                </div>
+                <div class="place-status">
+                    <span class="status @GetStatusClass(Model.Status.ToString())">
+                        @Model.StatusText
+                    </span>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <div class="info-grid">
+                    <div class="info-section">
+                        <h3><i class="fas fa-info-circle"></i> Información General</h3>
+                        <div class="info-items">
+                            <div class="info-item">
+                                <strong>Categoría:</strong>
+                                <span class="badge badge-primary">@Model.CategoryName</span>
+                            </div>
+                            <div class="info-item">
+                                <strong>Precio:</strong>
+                                <span class="price">@Model.Price.ToString("C")</span>
+                            </div>
+                            @if (Model.Capacity.HasValue)
+                            {
+                                <div class="info-item">
+                                    <strong>Capacidad:</strong>
+                                    <span>@Model.Capacity personas/espacios</span>
+                                </div>
+                            }
+                            @if (!string.IsNullOrEmpty(Model.Location))
+                            {
+                                <div class="info-item">
+                                    <strong>Ubicación:</strong>
+                                    <span><i class="fas fa-map-marker-alt"></i> @Model.Location</span>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="info-section">
+                        <h3><i class="fas fa-chart-bar"></i> Estadísticas</h3>
+                        <div class="stats-grid">
+                            @if (Model.AvailableSpaces.HasValue)
+                            {
+                                <div class="stat-box">
+                                    <div class="stat-number">@Model.AvailableSpaces</div>
+                                    <div class="stat-label">Disponible</div>
+                                </div>
+                            }
+                            <div class="stat-box">
+                                <div class="stat-number">@Model.CurrentOccupancy</div>
+                                <div class="stat-label">Ocupado</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-number">@Model.ReservationCount</div>
+                                <div class="stat-label">Total Reservas</div>
+                            </div>
+                            @if (Model.OccupancyRate.HasValue)
+                            {
+                                <div class="stat-box">
+                                    <div class="stat-number">@Math.Round(Model.OccupancyRate.Value, 0)%</div>
+                                    <div class="stat-label">Ocupación</div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrEmpty(Model.Description))
+                {
+                    <div class="description-section">
+                        <h3><i class="fas fa-align-left"></i> Descripción</h3>
+                        <p class="description-text">@Model.Description</p>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Contact Information -->
+        @if (!string.IsNullOrEmpty(Model.Contact))
+        {
+            <div class="details-card location-contact">
+                <div class="card-header">
+                    <h3><i class="fas fa-phone"></i> Información de Contacto</h3>
+                </div>
+                <div class="card-body">
+                    <div class="contact-item">
+                        <strong><i class="fas fa-phone"></i> Contacto:</strong>
+                        <p>@Model.Contact</p>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- Revenue Information -->
+        <div class="details-card revenue-info">
+            <div class="card-header">
+                <h3><i class="fas fa-dollar-sign"></i> Información de Ingresos</h3>
+            </div>
+            <div class="card-body">
+                <div class="revenue-grid">
+                    <div class="revenue-item">
+                        <strong>Ingresos Totales:</strong>
+                        <span class="revenue-amount">@Model.TotalRevenue.ToString("C")</span>
+                    </div>
+                    <div class="revenue-item">
+                        <strong>Ingresos del Mes:</strong>
+                        <span class="revenue-amount">@Model.MonthlyRevenue.ToString("C")</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Audit Information -->
+        <div class="details-card audit-info">
+            <div class="card-header">
+                <h3><i class="fas fa-history"></i> Información del Registro</h3>
+            </div>
+            <div class="card-body">
+                <div class="audit-grid">
+                    <div class="audit-item">
+                        <strong>Fecha de Creación:</strong>
+                        <span>@Model.CreatedDate.ToString("dd/MM/yyyy HH:mm")</span>
+                    </div>
+                    <div class="audit-item">
+                        <strong>Última Actualización:</strong>
+                        <span>@Model.UpdatedDate.ToString("dd/MM/yyyy HH:mm")</span>
+                    </div>
+                    <div class="audit-item">
+                        <strong>ID del Sistema:</strong>
+                        <span class="system-id">@Model.Id</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/tourism-system.js"></script>
+}

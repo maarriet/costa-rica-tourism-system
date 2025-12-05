@@ -1,0 +1,163 @@
+﻿@model CategoryViewModel
+@{
+    ViewData["Title"] = $"Editar - {Model.Name}";
+}
+
+@section Styles {
+    <link href="~/css/styles.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+}
+
+<div class="container">
+    <div class="section-header">
+        <h2><i class="fas fa-edit"></i> Editar Categoría</h2>
+        <div class="section-actions">
+            <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-info">
+                <i class="fas fa-eye"></i> Ver Detalles
+            </a>
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Volver a Lista
+            </a>
+        </div>
+    </div>
+
+    <div class="form-container">
+        <form asp-action="Edit" method="post">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+            <input asp-for="Id" type="hidden" />
+
+            <!-- Basic Information -->
+            <div class="form-section">
+                <h3><i class="fas fa-info-circle"></i> Información Básica</h3>
+
+                <div class="form-row">
+                    <div class="form-group col-md-8">
+                        <label asp-for="Name" class="form-label">Nombre de la Categoría *</label>
+                        <input asp-for="Name" class="form-control" placeholder="Ej: Hoteles y Hospedajes">
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label asp-for="IsActive" class="form-label">Estado</label>
+                        <div class="form-check form-switch">
+                            <input asp-for="IsActive" class="form-check-input" type="checkbox">
+                            <label class="form-check-label" asp-for="IsActive">
+                                Categoría Activa
+                            </label>
+                        </div>
+                        @if (!Model.IsActive && Model.PlaceCount > 0)
+                        {
+                            <small class="text-warning">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Esta categoría tiene @Model.PlaceCount lugares asociados
+                            </small>
+                        }
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Description" class="form-label">Descripción</label>
+                    <textarea asp-for="Description" class="form-control" rows="3"
+                              placeholder="Describe el tipo de lugares que incluye esta categoría..."></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+            </div>
+
+            <!-- Visual Settings -->
+            <div class="form-section">
+                <h3><i class="fas fa-palette"></i> Configuración Visual</h3>
+
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label asp-for="Icon" class="form-label">Icono (Font Awesome)</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">
+                                    <i class="@Model.Icon" id="icon-preview"></i>
+                                </span>
+                            </div>
+                            <input asp-for="Icon" class="form-control" placeholder="fas fa-hotel"
+                                   onkeyup="updateIconPreview(this.value)">
+                        </div>
+                        <span asp-validation-for="Icon" class="text-danger"></span>
+                        <small class="form-text text-muted">
+                            Ejemplos: fas fa-hotel, fas fa-utensils, fas fa-mountain, fas fa-umbrella-beach
+                        </small>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label asp-for="Color" class="form-label">Color</label>
+                        <div class="input-group">
+                            <input asp-for="Color" class="form-control" type="color"
+                                   onchange="updateColorPreview(this.value)">
+                            <div class="input-group-append">
+                                <span class="input-group-text" id="color-preview" style="background-color: @Model.Color">
+                                    Vista previa
+                                </span>
+                            </div>
+                        </div>
+                        <span asp-validation-for="Color" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- Preview Card -->
+                <div class="preview-section">
+                    <h4>Vista Previa:</h4>
+                    <div class="category-preview-card">
+                        <i class="@Model.Icon" id="preview-icon" style="color: @Model.Color"></i>
+                        <span id="preview-name">@Model.Name</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistics (Read-only) -->
+            <div class="form-section">
+                <h3><i class="fas fa-chart-bar"></i> Estadísticas Actuales</h3>
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-number">@Model.PlaceCount</div>
+                        <div class="stat-label">Lugares</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">@Model.ReservationCount</div>
+                        <div class="stat-label">Reservas</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">@Model.Revenue.ToString("C")</div>
+                        <div class="stat-label">Ingresos</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="fas fa-save"></i> Guardar Cambios
+                </button>
+                <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-info btn-lg">
+                    <i class="fas fa-eye"></i> Ver Detalles
+                </a>
+                <a asp-action="Index" class="btn btn-secondary btn-lg">
+                    <i class="fas fa-times"></i> Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/tourism-system.js"></script>
+    <script>
+        function updateIconPreview(iconClass) {
+            document.getElementById('icon-preview').className = iconClass || 'fas fa-tag';
+            document.getElementById('preview-icon').className = iconClass || 'fas fa-tag';
+        }
+
+        function updateColorPreview(color) {
+            document.getElementById('color-preview').style.backgroundColor = color;
+            document.getElementById('preview-icon').style.color = color;
+        }
+
+        document.querySelector('input[name="Name"]').addEventListener('keyup', function() {
+            document.getElementById('preview-name').textContent = this.value || 'Nombre de Categoría';
+        });
+    </script>
+}

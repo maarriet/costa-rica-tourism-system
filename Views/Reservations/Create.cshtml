@@ -1,0 +1,280 @@
+﻿@model ReservationViewModel
+@{
+    ViewData["Title"] = "Nueva Reserva";
+}
+
+@section Styles {
+    <link href="~/css/styles.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+}
+
+<div class="container">
+    <div class="section-header">
+        <h2><i class="fas fa-plus"></i> Nueva Reserva</h2>
+        <div class="section-actions">
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Volver a Lista
+            </a>
+        </div>
+    </div>
+
+    <div class="form-container">
+        <form asp-action="Create" method="post">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+            <!-- Customer Information -->
+            <div class="form-section">
+                <h3><i class="fas fa-user"></i> Información del Cliente</h3>
+
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label asp-for="ClientName" class="form-label">Nombre Completo *</label>
+                        <input asp-for="ClientName" class="form-control" placeholder="Ej: Juan Pérez González">
+                        <span asp-validation-for="ClientName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label asp-for="ClientEmail" class="form-label">Correo Electrónico *</label>
+                        <input asp-for="ClientEmail" class="form-control" type="email" placeholder="cliente@email.com">
+                        <span asp-validation-for="ClientEmail" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label asp-for="ClientPhone" class="form-label">Teléfono</label>
+                        <input asp-for="ClientPhone" class="form-control" placeholder="Ej: +506 8888-8888">
+                        <span asp-validation-for="ClientPhone" class="text-danger"></span>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label asp-for="NumberOfPeople" class="form-label">Número de Personas *</label>
+                        <input asp-for="NumberOfPeople" class="form-control" type="number" min="1" max="20"
+                               onchange="calculateTotal()">
+                        <span asp-validation-for="NumberOfPeople" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Place and Dates -->
+            <div class="form-section">
+                <h3><i class="fas fa-map-marker-alt"></i> Lugar y Fechas</h3>
+
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        <label asp-for="PlaceId" class="form-label">Lugar Turístico *</label>
+                        <select asp-for="PlaceId" class="form-control" asp-items="@ViewBag.Places"
+                                onchange="updatePlaceInfo()">
+                            <option value="">Seleccionar lugar</option>
+                        </select>
+                        <span asp-validation-for="PlaceId" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label asp-for="StartDate" class="form-label">Fecha de Inicio *</label>
+                        <input asp-for="StartDate" class="form-control" type="date"
+                               min="@DateTime.Today.ToString("yyyy-MM-dd")"
+                               onchange="calculateDays(); calculateTotal()">
+                        <span asp-validation-for="StartDate" class="text-danger"></span>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label asp-for="EndDate" class="form-label">Fecha de Fin</label>
+                        <input asp-for="EndDate" class="form-control" type="date"
+                               onchange="calculateDays(); calculateTotal()">
+                        <span asp-validation-for="EndDate" class="text-danger"></span>
+                        <small class="form-text text-muted">Opcional para reservas de un solo día</small>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label asp-for="StartTime" class="form-label">Hora de Inicio</label>
+                        <input asp-for="StartTime" class="form-control" type="time">
+                        <span asp-validation-for="StartTime" class="text-danger"></span>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label asp-for="EndTime" class="form-label">Hora de Fin</label>
+                        <input asp-for="EndTime" class="form-control" type="time">
+                        <span asp-validation-for="EndTime" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pricing and Status -->
+            <div class="form-section">
+                <h3><i class="fas fa-dollar-sign"></i> Precio y Estado</h3>
+
+                <div class="form-row">
+                    <div class="form-group col-md-4">
+                        <label asp-for="PlacePrice" class="form-label">Precio por Noche/Día</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">$</span>
+                            </div>
+                            <input asp-for="PlacePrice" class="form-control" type="number" step="0.01"
+                                   readonly id="place-price-input">
+                        </div>
+                        <small class="form-text text-muted">Se actualiza automáticamente al seleccionar el lugar</small>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label class="form-label">Días/Noches</label>
+                        <input type="number" class="form-control" id="days-count" readonly value="1">
+                        <small class="form-text text-muted">Calculado automáticamente</small>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label asp-for="TotalAmount" class="form-label">Total a Pagar</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">$</span>
+                            </div>
+                            <input asp-for="TotalAmount" class="form-control total-amount" type="number" step="0.01"
+                                   id="total-amount-input">
+                        </div>
+                        <span asp-validation-for="TotalAmount" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label asp-for="Status" class="form-label">Estado Inicial</label>
+                        <select asp-for="Status" class="form-control" asp-items="Html.GetEnumSelectList<ReservationStatus>()">
+                        </select>
+                        <span asp-validation-for="Status" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Notes -->
+            <div class="form-section">
+                <h3><i class="fas fa-sticky-note"></i> Notas Adicionales</h3>
+
+                <div class="form-group">
+                    <label asp-for="Notes" class="form-label">Observaciones</label>
+                    <textarea asp-for="Notes" class="form-control" rows="4"
+                              placeholder="Notas especiales, requerimientos del cliente, etc."></textarea>
+                    <span asp-validation-for="Notes" class="text-danger"></span>
+                </div>
+            </div>
+
+            <!-- Reservation Summary -->
+            <div class="form-section reservation-summary">
+                <h3><i class="fas fa-receipt"></i> Resumen de la Reserva</h3>
+                <div class="summary-card">
+                    <div class="summary-row">
+                        <span class="summary-label">Cliente:</span>
+                        <span class="summary-value" id="summary-client">-</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-label">Lugar:</span>
+                        <span class="summary-value" id="summary-place">-</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-label">Fechas:</span>
+                        <span class="summary-value" id="summary-dates">-</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-label">Personas:</span>
+                        <span class="summary-value" id="summary-people">-</span>
+                    </div>
+                    <div class="summary-row total-row">
+                        <span class="summary-label">Total:</span>
+                        <span class="summary-value" id="summary-total">$0.00</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="fas fa-save"></i> Crear Reserva
+                </button>
+                <a asp-action="Index" class="btn btn-secondary btn-lg">
+                    <i class="fas fa-times"></i> Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/tourism-system.js"></script>
+    <script>
+        // Place data (this would come from the server)
+        const placesData = @Html.Raw(Json.Serialize(ViewBag.PlacesData ?? new object()));
+
+        function updatePlaceInfo() {
+            const placeId = document.querySelector('select[name="PlaceId"]').value;
+            const placeData = placesData.find(p => p.id == placeId);
+
+            if (placeData) {
+                document.getElementById('place-price-input').value = placeData.price;
+                document.getElementById('summary-place').textContent = placeData.name;
+                calculateTotal();
+            } else {
+                document.getElementById('place-price-input').value = '';
+                document.getElementById('summary-place').textContent = '-';
+            }
+        }
+
+        function calculateDays() {
+            const startDate = document.querySelector('input[name="StartDate"]').value;
+            const endDate = document.querySelector('input[name="EndDate"]').value;
+
+            if (startDate && endDate) {
+                const start = new Date(startDate);
+                const end = new Date(endDate);
+                const diffTime = Math.abs(end - start);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                document.getElementById('days-count').value = diffDays || 1;
+                updateSummaryDates();
+            } else {
+                document.getElementById('days-count').value = 1;
+            }
+        }
+
+        function calculateTotal() {
+            const price = parseFloat(document.getElementById('place-price-input').value) || 0;
+            const days = parseInt(document.getElementById('days-count').value) || 1;
+            const people = parseInt(document.querySelector('input[name="NumberOfPeople"]').value) || 1;
+
+            const total = price * days;
+            document.getElementById('total-amount-input').value = total.toFixed(2);
+            document.getElementById('summary-total').textContent = '$' + total.toFixed(2);
+        }
+
+        function updateSummaryDates() {
+            const startDate = document.querySelector('input[name="StartDate"]').value;
+            const endDate = document.querySelector('input[name="EndDate"]').value;
+            const startTime = document.querySelector('input[name="StartTime"]').value;
+            const endTime = document.querySelector('input[name="EndTime"]').value;
+
+            let dateText = startDate ? new Date(startDate).toLocaleDateString() : '-';
+            if (endDate) {
+                dateText += ' → ' + new Date(endDate).toLocaleDateString();
+            }
+            if (startTime) {
+                dateText += ' (' + startTime;
+                if (endTime) {
+                    dateText += ' - ' + endTime;
+                }
+                dateText += ')';
+            }
+
+            document.getElementById('summary-dates').textContent = dateText;
+        }
+
+        // Event listeners for real-time updates
+        document.querySelector('input[name="ClientName"]').addEventListener('input', function() {
+            document.getElementById('summary-client').textContent = this.value || '-';
+        });
+
+        document.querySelector('input[name="NumberOfPeople"]').addEventListener('input', function() {
+            document.getElementById('summary-people').textContent = this.value || '-';
+        });
+
+        document.querySelector('input[name="StartDate"]').addEventListener('change', updateSummaryDates);
+        document.querySelector('input[name="EndDate"]').addEventListener('change', updateSummaryDates);
+        document.querySelector('input[name="StartTime"]').addEventListener('change', updateSummaryDates);
+        document.querySelector('input[name="EndTime"]').addEventListener('change', updateSummaryDates);
+    </script>
+}

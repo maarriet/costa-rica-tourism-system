@@ -1,0 +1,202 @@
+﻿@model CategoryViewModel
+@{
+    ViewData["Title"] = $"Detalles - {Model.Name}";
+    string GetStatusClass(bool isActive) => isActive ? "status-available" : "status-inactive";
+}
+
+@section Styles {
+    <link href="~/css/styles.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+}
+
+<div class="container">
+    <div class="section-header">
+        <h2><i class="fas fa-eye"></i> Detalles de la Categoría</h2>
+        <div class="section-actions">
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">
+                <i class="fas fa-edit"></i> Editar
+            </a>
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Volver a Lista
+            </a>
+        </div>
+    </div>
+
+    <div class="details-container">
+        <!-- Main Information Card -->
+        <div class="details-card main-info">
+            <div class="card-header">
+                <div class="category-title">
+                    <div class="category-visual">
+                        <i class="@Model.Icon category-main-icon" style="color: @Model.Color"></i>
+                        <h1>@Model.Name</h1>
+                    </div>
+                </div>
+                <div class="category-status">
+                    <span class="status @GetStatusClass(Model.IsActive)">
+                        @(Model.IsActive ? "Activa" : "Inactiva")
+                    </span>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <div class="info-grid">
+                    <div class="info-section">
+                        <h3><i class="fas fa-info-circle"></i> Información General</h3>
+                        <div class="info-items">
+                            <div class="info-item">
+                                <strong>Nombre:</strong>
+                                <span>@Model.Name</span>
+                            </div>
+                            <div class="info-item">
+                                <strong>Estado:</strong>
+                                <span class="status @GetStatusClass(Model.IsActive)">
+                                    @(Model.IsActive ? "Activa" : "Inactiva")
+                                </span>
+                            </div>
+                            <div class="info-item">
+                                <strong>Icono:</strong>
+                                <span>
+                                    <i class="@Model.Icon"></i> @Model.Icon
+                                </span>
+                            </div>
+                            <div class="info-item">
+                                <strong>Color:</strong>
+                                <span>
+                                    <span class="color-sample" style="background-color: @Model.Color"></span>
+                                    @Model.Color
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-section">
+                        <h3><i class="fas fa-chart-bar"></i> Estadísticas</h3>
+                        <div class="stats-grid">
+                            <div class="stat-box">
+                                <div class="stat-number">@Model.PlaceCount</div>
+                                <div class="stat-label">Lugares</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-number">@Model.ReservationCount</div>
+                                <div class="stat-label">Reservas</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-number">@Model.Revenue.ToString("C")</div>
+                                <div class="stat-label">Ingresos</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrEmpty(Model.Description))
+                {
+                    <div class="description-section">
+                        <h3><i class="fas fa-align-left"></i> Descripción</h3>
+                        <p class="description-text">@Model.Description</p>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Places in Category -->
+        @if (Model.Places != null && Model.Places.Any())
+        {
+            <div class="details-card places-list">
+                <div class="card-header">
+                    <h3><i class="fas fa-map-marker-alt"></i> Lugares en esta Categoría (@Model.Places.Count)</h3>
+                </div>
+                <div class="card-body">
+                    <div class="places-grid">
+                        @foreach (var place in Model.Places.Take(6))
+                        {
+                            <div class="place-card">
+                                <div class="place-header">
+                                    <h4>@place.Name</h4>
+                                    <span class="place-code">@place.Code</span>
+                                </div>
+                                <div class="place-info">
+                                    <div class="place-detail">
+                                        <strong>Precio:</strong> @place.Price.ToString("C")
+                                    </div>
+                                    <div class="place-detail">
+                                        <strong>Estado:</strong> @place.StatusText
+                                    </div>
+                                    @if (!string.IsNullOrEmpty(place.Location))
+                                    {
+                                        <div class="place-detail">
+                                            <strong>Ubicación:</strong> @place.Location
+                                        </div>
+                                    }
+                                </div>
+                                <div class="place-actions">
+                                    <a asp-controller="Places" asp-action="Details" asp-route-id="@place.Id"
+                                       class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye"></i> Ver
+                                    </a>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    @if (Model.Places.Count > 6)
+                    {
+                        <div class="more-places">
+                            <p class="text-muted">Y @(Model.Places.Count - 6) lugares más...</p>
+                            <a asp-controller="Places" asp-action="Index" asp-route-categoryFilter="@Model.Id"
+                               class="btn btn-outline-secondary">
+                                <i class="fas fa-list"></i> Ver todos los lugares
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="details-card empty-places">
+                <div class="card-body text-center">
+                    <i class="fas fa-map-marker-alt empty-icon"></i>
+                    <h3>No hay lugares en esta categoría</h3>
+                    <p class="text-muted">Aún no se han agregado lugares a esta categoría</p>
+                    <a asp-controller="Places" asp-action="Create" asp-route-categoryId="@Model.Id"
+                       class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Agregar Primer Lugar
+                    </a>
+                </div>
+            </div>
+        }
+
+        <!-- Performance Metrics -->
+        <div class="details-card performance-metrics">
+            <div class="card-header">
+                <h3><i class="fas fa-analytics"></i> Métricas de Rendimiento</h3>
+            </div>
+            <div class="card-body">
+                <div class="metrics-grid">
+                    <div class="metric-item">
+                        <div class="metric-label">Promedio de Ingresos por Lugar</div>
+                        <div class="metric-value">
+                            @(Model.PlaceCount > 0 ? (Model.Revenue / Model.PlaceCount).ToString("C") : "$0.00")
+                        </div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-label">Promedio de Reservas por Lugar</div>
+                        <div class="metric-value">
+                            @(Model.PlaceCount > 0 ? Math.Round((decimal)Model.ReservationCount / Model.PlaceCount, 1) : 0)
+                        </div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-label">Ingreso Promedio por Reserva</div>
+                        <div class="metric-value">
+                            @(Model.ReservationCount > 0 ? (Model.Revenue / Model.ReservationCount).ToString("C") : "$0.00")
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/tourism-system.js"></script>
+}

@@ -1,0 +1,247 @@
+﻿@model ReservationViewModel
+@{
+    ViewData["Title"] = $"Cancelar Reserva - {Model.ReservationCode}";
+    bool isUpcoming = Model.DaysUntilReservation >= 0;
+    bool hasRevenue = Model.TotalAmount > 0;
+}
+
+@section Styles {
+    <link href="~/css/styles.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+}
+
+<div class="container">
+    <div class="section-header">
+        <h2><i class="fas fa-ban text-danger"></i> Cancelar Reserva</h2>
+        <div class="section-actions">
+            <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-info">
+                <i class="fas fa-eye"></i> Ver Detalles
+            </a>
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Volver a Lista
+            </a>
+        </div>
+    </div>
+
+    <div class="delete-container">
+        <!-- Warning Card -->
+        <div class="alert alert-warning delete-warning">
+            <div class="warning-header">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h3>¿Está seguro que desea cancelar esta reserva?</h3>
+            </div>
+            <p>Esta acción cambiará el estado de la reserva a "Cancelada". La reserva se mantendrá en el sistema para fines de historial.</p>
+        </div>
+
+        <!-- Reservation Information -->
+        <div class="details-card delete-info">
+            <div class="card-header">
+                <div class="reservation-title">
+                    <h1><i class="fas fa-ticket-alt"></i> @Model.ReservationCode</h1>
+                    <span class="current-status">Estado actual: @Model.Status</span>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <div class="info-grid">
+                    <div class="info-section">
+                        <h3><i class="fas fa-user"></i> Información del Cliente</h3>
+                        <div class="info-items">
+                            <div class="info-item">
+                                <strong>Cliente:</strong>
+                                <span>@Model.ClientName</span>
+                            </div>
+                            <div class="info-item">
+                                <strong>Email:</strong>
+                                <span>@Model.ClientEmail</span>
+                            </div>
+                            @if (!string.IsNullOrEmpty(Model.ClientPhone))
+                            {
+                                <div class="info-item">
+                                    <strong>Teléfono:</strong>
+                                    <span>@Model.ClientPhone</span>
+                                </div>
+                            }
+                            <div class="info-item">
+                                <strong>Personas:</strong>
+                                <span>@Model.NumberOfPeople</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-section">
+                        <h3><i class="fas fa-calendar-alt"></i> Detalles de la Reserva</h3>
+                        <div class="info-items">
+                            <div class="info-item">
+                                <strong>Lugar:</strong>
+                                <span>@Model.PlaceName</span>
+                            </div>
+                            <div class="info-item">
+                                <strong>Fecha:</strong>
+                                <span>@Model.StartDate.ToString("dd/MM/yyyy")</span>
+                                @if (Model.EndDate.HasValue)
+                                {
+                                    <span> → @Model.EndDate.Value.ToString("dd/MM/yyyy")</span>
+                                }
+                            </div>
+                            <div class="info-item">
+                                <strong>Total:</strong>
+                                <span class="amount">@Model.TotalAmount.ToString("C")</span>
+                            </div>
+                            <div class="info-item">
+                                <strong>Días restantes:</strong>
+                                @if (Model.DaysUntilReservation >= 0)
+                                {
+                                    <span class="@(Model.DaysUntilReservation <= 3 ? "text-warning" : "text-success")">
+                                        @Model.DaysUntilReservation días
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Reserva pasada</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Impact Warning -->
+        <div class="alert alert-info impact-warning">
+            <h4><i class="fas fa-info-circle"></i> Impacto de la Cancelación</h4>
+            <ul class="impact-list">
+                <li>La reserva cambiará su estado a <strong>"Cancelada"</strong></li>
+                <li>Se liberará la disponibilidad en el lugar para las fechas seleccionadas</li>
+                @if (hasRevenue)
+                {
+                    <li>El monto de <strong>@Model.TotalAmount.ToString("C")</strong> quedará registrado como ingreso cancelado</li>
+                }
+                @if (isUpcoming)
+                {
+                    <li>Se puede notificar automáticamente al cliente sobre la cancelación</li>
+                }
+                <li>La reserva se mantendrá en el historial del sistema</li>
+            </ul>
+        </div>
+
+        <!-- Cancellation Options -->
+        <div class="details-card cancellation-options">
+            <div class="card-header">
+                <h3><i class="fas fa-cog"></i> Opciones de Cancelación</h3>
+            </div>
+            <div class="card-body">
+                <form asp-action="Delete" method="post" id="cancellationForm">
+                    <input asp-for="Id" type="hidden" />
+
+                    <div class="form-group">
+                        <label class="form-label">Motivo de la cancelación:</label>
+                        <select name="cancellationReason" class="form-control" required>
+                            <option value="">Seleccionar motivo</option>
+                            <option value="ClientRequest">Solicitud del cliente</option>
+                            <option value="PlaceUnavailable">Lugar no disponible</option>
+                            <option value="WeatherConditions">Condiciones climáticas</option>
+                            <option value="Emergency">Emergencia</option>
+                            <option value="PaymentIssue">Problema de pago</option>
+                            <option value="Other">Otro motivo</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Notas adicionales:</label>
+                        <textarea name="cancellationNotes" class="form-control" rows="3"
+                                  placeholder="Detalles adicionales sobre la cancelación..."></textarea>
+                    </div>
+
+                    @if (isUpcoming)
+                    {
+                        <div class="form-group">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="notifyClient" id="notifyClient" checked>
+                                <label class="form-check-label" for="notifyClient">
+                                    Notificar al cliente por email sobre la cancelación
+                                </label>
+                            </div>
+                        </div>
+                    }
+
+                    @if (hasRevenue)
+                    {
+                        <div class="form-group">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="processRefund" id="processRefund">
+                                <label class="form-check-label" for="processRefund">
+                                    Marcar para procesamiento de reembolso (@Model.TotalAmount.ToString("C"))
+                                </label>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="confirmation-section">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="confirmCancellation" required>
+                            <label class="form-check-label" for="confirmCancellation">
+                                Confirmo que deseo cancelar esta reserva y entiendo las consecuencias
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="delete-actions">
+            <div class="button-group">
+                <button type="submit" form="cancellationForm" class="btn btn-danger btn-lg" id="cancelButton" disabled>
+                    <i class="fas fa-ban"></i> Confirmar Cancelación
+                </button>
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning btn-lg">
+                    <i class="fas fa-edit"></i> Mejor Editar
+                </a>
+                <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-info btn-lg">
+                    <i class="fas fa-eye"></i> Ver Detalles
+                </a>
+                <a asp-action="Index" class="btn btn-secondary btn-lg">
+                    <i class="fas fa-times"></i> Cancelar Acción
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/tourism-system.js"></script>
+    <script>
+        document.getElementById('confirmCancellation').addEventListener('change', function() {
+            const cancelButton = document.getElementById('cancelButton');
+            const reasonSelect = document.querySelector('select[name="cancellationReason"]');
+
+            if (this.checked && reasonSelect.value) {
+                cancelButton.removeAttribute('disabled');
+            } else {
+                cancelButton.setAttribute('disabled', 'disabled');
+            }
+        });
+
+        document.querySelector('select[name="cancellationReason"]').addEventListener('change', function() {
+            const cancelButton = document.getElementById('cancelButton');
+            const confirmCheck = document.getElementById('confirmCancellation');
+
+            if (this.value && confirmCheck.checked) {
+                cancelButton.removeAttribute('disabled');
+            } else {
+                cancelButton.setAttribute('disabled', 'disabled');
+            }
+        });
+
+        // Confirmation before submit
+        document.getElementById('cancellationForm').addEventListener('submit', function(e) {
+            const clientName = '@Model.ClientName';
+            const reservationCode = '@Model.ReservationCode';
+
+            if (!confirm(`¿Está completamente seguro de cancelar la reserva ${reservationCode} de ${clientName}?`)) {
+                e.preventDefault();
+            }
+        });
+    </script>
+}

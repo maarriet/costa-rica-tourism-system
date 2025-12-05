@@ -1,0 +1,373 @@
+﻿@model ReservationListViewModel
+@{
+    ViewData["Title"] = "Gestión de Reservas";
+
+    string GetStatusClass(ReservationStatus status) => status switch
+    {
+        ReservationStatus.Confirmed => "status-available",
+        ReservationStatus.Pending => "status-maintenance",
+        ReservationStatus.Cancelled => "status-inactive",
+        ReservationStatus.Completed => "status-busy",
+        _ => "status-inactive"
+    };
+
+    string GetStatusText(ReservationStatus status) => status switch
+    {
+        ReservationStatus.Confirmed => "Confirmada",
+        ReservationStatus.Pending => "Pendiente",
+        ReservationStatus.Cancelled => "Cancelada",
+        ReservationStatus.Completed => "Completada",
+        _ => "Desconocido"
+    };
+}
+
+@section Styles {
+    <link href="~/css/styles.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+}
+
+<div class="container">
+    <div class="section-header">
+        <h2><i class="fas fa-calendar-check"></i> Gestión de Reservas</h2>
+        <div class="section-actions">
+            <a asp-action="Create" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Nueva Reserva
+            </a>
+            <button class="btn btn-info" onclick="exportReservations()">
+                <i class="fas fa-download"></i> Exportar
+            </button>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="stats-overview">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-calendar-check"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-number">@Model.Reservations.Count(r => r.Status == ReservationStatus.Confirmed)</div>
+                <div class="stat-label">Confirmadas</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-number">@Model.Reservations.Count(r => r.Status == ReservationStatus.Pending)</div>
+                <div class="stat-label">Pendientes</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-dollar-sign"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-number">@Model.Reservations.Sum(r => r.TotalAmount).ToString("C")</div>
+                <div class="stat-label">Ingresos Totales</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-number">@Model.Reservations.Sum(r => r.NumberOfPeople)</div>
+                <div class="stat-label">Total Huéspedes</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-section">
+        <form method="get" asp-action="Index">
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label asp-for="DateFrom" class="filter-label">Desde:</label>
+                    <input asp-for="DateFrom" class="form-control" type="date">
+                </div>
+                <div class="filter-group">
+                    <label asp-for="DateTo" class="filter-label">Hasta:</label>
+                    <input asp-for="DateTo" class="form-control" type="date">
+                </div>
+                <div class="filter-group">
+                    <label asp-for="StatusFilter" class="filter-label">Estado:</label>
+                    <select asp-for="StatusFilter" class="form-control" asp-items="Html.GetEnumSelectList<ReservationStatus>()">
+                        <option value="">Todos los estados</option>
+                    </select>
+                </div>
+                <div class="filter-actions">
+                    <button type="submit" class="btn btn-secondary">
+                        <i class="fas fa-search"></i> Filtrar
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="fas fa-times"></i> Limpiar
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Filter Summary -->
+    @if (Model.DateFrom.HasValue || Model.DateTo.HasValue || Model.StatusFilter.HasValue)
+    {
+        <div class="filter-summary">
+            <i class="fas fa-filter"></i>
+            <span>
+                Filtros activos:
+                @if (Model.DateFrom.HasValue)
+                {
+                    <text>Desde @Model.DateFrom.Value.ToString("dd/MM/yyyy")</text>
+                }
+                @if (Model.DateTo.HasValue)
+                {
+                    <text>Hasta @Model.DateTo.Value.ToString("dd/MM/yyyy")</text>
+                }
+                @if (Model.StatusFilter.HasValue)
+                {
+                    <text>Estado: @GetStatusText(Model.StatusFilter.Value)</text>
+                }
+            </span>
+        </div>
+    }
+
+    <!-- Reservations Table -->
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Cliente</th>
+                    <th>Lugar</th>
+                    <th>Fechas</th>
+                    <th>Personas</th>
+                    <th>Estado</th>
+                    <th>Total</th>
+                    <th>Días Restantes</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Reservations != null && Model.Reservations.Any())
+                {
+                    @foreach (var reservation in Model.Reservations)
+                    {
+                        <tr>
+                            <td><span class="code">@reservation.ReservationCode</span></td>
+                            <td>
+                                <div class="customer-info">
+                                    <strong>@reservation.ClientName</strong>
+                                    @if (!string.IsNullOrEmpty(reservation.ClientEmail))
+                                    {
+                                        <small>@reservation.ClientEmail</small>
+                                    }
+                                    @if (!string.IsNullOrEmpty(reservation.ClientPhone))
+                                    {
+                                        <small><i class="fas fa-phone"></i> @reservation.ClientPhone</small>
+                                    }
+                                </div>
+                            </td>
+                            <td>
+                                <div class="place-info">
+                                    <strong>@reservation.PlaceName</strong>
+                                    @if (!string.IsNullOrEmpty(reservation.CategoryName))
+                                    {
+                                        <small class="badge badge-secondary">@reservation.CategoryName</small>
+                                    }
+                                </div>
+                            </td>
+                            <td>
+                                <div class="date-info">
+                                    <div class="check-dates">
+                                        <strong>@reservation.StartDate.ToString("dd/MM/yyyy")</strong>
+                                        @if (reservation.StartTime.HasValue)
+                                        {
+                                            <span class="time">@reservation.StartTime.Value.ToString(@"hh\:mm")</span>
+                                        }
+                                        @if (reservation.EndDate.HasValue)
+                                        {
+                                            <div class="date-separator">→</div>
+                                            <strong>@reservation.EndDate.Value.ToString("dd/MM/yyyy")</strong>
+                                            @if (reservation.EndTime.HasValue)
+                                            {
+                                                <span class="time">@reservation.EndTime.Value.ToString(@"hh\:mm")</span>
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="guest-count">
+                                    <i class="fas fa-users"></i> @reservation.NumberOfPeople
+                                </span>
+                            </td>
+                            <td>
+                                <span class="status @GetStatusClass(reservation.Status)">
+                                    @GetStatusText(reservation.Status)
+                                </span>
+                            </td>
+                            <td>
+                                <div class="amount-info">
+                                    <strong>@reservation.TotalAmount.ToString("C")</strong>
+                                    @if (reservation.PlacePrice > 0)
+                                    {
+                                        <small>(@reservation.PlacePrice.ToString("C")/noche)</small>
+                                    }
+                                </div>
+                            </td>
+                            <td>
+                                @if (reservation.DaysUntilReservation >= 0)
+                                {
+                                    <span class="days-until @(reservation.DaysUntilReservation <= 3 ? "text-warning" : "text-muted")">
+                                        @if (reservation.DaysUntilReservation == 0)
+                                        {
+                                            <strong>Hoy</strong>
+                                        }
+                                        else if (reservation.DaysUntilReservation == 1)
+                                        {
+                                            <strong>Mañana</strong>
+                                        }
+                                        else
+                                        {
+                                            <span>@reservation.DaysUntilReservation días</span>
+                                        }
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Pasada</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a asp-action="Edit" asp-route-id="@reservation.Id" class="btn-icon btn-edit" title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a asp-action="Details" asp-route-id="@reservation.Id" class="btn-icon btn-view" title="Ver detalles">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    @if (reservation.Status == ReservationStatus.Pending)
+                                    {
+                                        <button class="btn-icon btn-success" onclick="confirmReservation(@reservation.Id)" title="Confirmar">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                    }
+                                    @if (reservation.Status != ReservationStatus.Cancelled && reservation.Status != ReservationStatus.Completed)
+                                    {
+                                        <a asp-action="Delete" asp-route-id="@reservation.Id" class="btn-icon btn-delete" title="Cancelar">
+                                            <i class="fas fa-ban"></i>
+                                        </a>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="9" class="text-center">
+                            <div class="empty-state">
+                                <i class="fas fa-calendar-check"></i>
+                                <h3>No hay reservas registradas</h3>
+                                <p>Comienza creando tu primera reserva</p>
+                                <a asp-action="Create" class="btn btn-primary">
+                                    <i class="fas fa-plus"></i> Crear Primera Reserva
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    @if (Model.TotalPages > 1)
+    {
+        <div class="pagination-container">
+            <div class="pagination-info">
+                @Model.ItemsDisplayRange
+            </div>
+            <div class="pagination">
+                @if (Model.HasPreviousPage)
+                {
+                    <a asp-action="Index"
+                       asp-route-page="@Model.PreviousPage"
+                       asp-route-dateFrom="@Model.DateFrom?.ToString("yyyy-MM-dd")"
+                       asp-route-dateTo="@Model.DateTo?.ToString("yyyy-MM-dd")"
+                       asp-route-statusFilter="@Model.StatusFilter"
+                       class="btn-page">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                }
+
+                @foreach (var pageNumber in Model.GetPageNumbers())
+                {
+                    <a asp-action="Index"
+                       asp-route-page="@pageNumber"
+                       asp-route-dateFrom="@Model.DateFrom?.ToString("yyyy-MM-dd")"
+                       asp-route-dateTo="@Model.DateTo?.ToString("yyyy-MM-dd")"
+                       asp-route-statusFilter="@Model.StatusFilter"
+                       class="btn-page @(pageNumber == Model.CurrentPage ? "active" : "")">
+                        @pageNumber
+                    </a>
+                }
+
+                @if (Model.HasNextPage)
+                {
+                    <a asp-action="Index"
+                       asp-route-page="@Model.NextPage"
+                       asp-route-dateFrom="@Model.DateFrom?.ToString("yyyy-MM-dd")"
+                       asp-route-dateTo="@Model.DateTo?.ToString("yyyy-MM-dd")"
+                       asp-route-statusFilter="@Model.StatusFilter"
+                       class="btn-page">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="~/js/tourism-system.js"></script>
+    <script>
+        function confirmReservation(reservationId) {
+            if (confirm('¿Confirmar esta reserva?')) {
+                fetch(`/Reservations/Confirm/${reservationId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value
+                    }
+                }).then(response => {
+                    if (response.ok) {
+                        location.reload();
+                    } else {
+                        alert('Error al confirmar la reserva');
+                    }
+                }).catch(error => {
+                    console.error('Error:', error);
+                    alert('Error al confirmar la reserva');
+                });
+            }
+        }
+
+        function exportReservations() {
+            const params = new URLSearchParams();
+            if (document.querySelector('input[name="DateFrom"]').value) {
+                params.append('dateFrom', document.querySelector('input[name="DateFrom"]').value);
+            }
+            if (document.querySelector('input[name="DateTo"]').value) {
+                params.append('dateTo', document.querySelector('input[name="DateTo"]').value);
+            }
+            if (document.querySelector('select[name="StatusFilter"]').value) {
+                params.append('statusFilter', document.querySelector('select[name="StatusFilter"]').value);
+            }
+
+            window.open(`/Reservations/Export?${params.toString()}`, '_blank');
+        }
+    </script>
+}

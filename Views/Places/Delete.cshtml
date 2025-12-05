@@ -1,0 +1,215 @@
+﻿@model PlaceViewModel
+@{
+    ViewData["Title"] = $"Eliminar - {Model.Name}";
+
+    string GetStatusClass(string status) => status?.ToUpper() switch
+    {
+        "AVAILABLE" => "status-available",
+        "OCCUPIED" => "status-busy",
+        "MAINTENANCE" => "status-maintenance",
+        _ => "status-inactive"
+    };
+}
+
+@section Styles {
+    <link href="~/css/styles.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+}
+
+<div class="container">
+    <div class="section-header">
+        <h2><i class="fas fa-exclamation-triangle text-danger"></i> Confirmar Eliminación</h2>
+        <div class="section-actions">
+            <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-info">
+                <i class="fas fa-eye"></i> Ver Detalles
+            </a>
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Volver a Lista
+            </a>
+        </div>
+    </div>
+
+    <div class="delete-container">
+        <div class="delete-warning">
+            <div class="warning-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="warning-content">
+                <h3>¿Estás seguro de que quieres eliminar este lugar?</h3>
+                <p>Esta acción no se puede deshacer. Se eliminará permanentemente el lugar y toda la información asociada.</p>
+            </div>
+        </div>
+
+        <!-- Place Information Summary -->
+        <div class="delete-summary">
+            <div class="summary-header">
+                <h4><i class="fas fa-info-circle"></i> Información del Lugar a Eliminar</h4>
+            </div>
+
+            <div class="summary-content">
+                <div class="place-overview">
+                    <div class="place-main-info">
+                        <h2>@Model.Name</h2>
+                        <p class="place-code">Código: @Model.Code</p>
+                        <p class="place-category">
+                            <span class="badge badge-primary">@Model.CategoryName</span>
+                        </p>
+                    </div>
+
+                    <div class="place-details-grid">
+                        <div class="detail-item">
+                            <strong>Precio:</strong>
+                            <span>@Model.Price.ToString("C")</span>
+                        </div>
+                        @if (Model.Capacity.HasValue)
+                        {
+                            <div class="detail-item">
+                                <strong>Capacidad:</strong>
+                                <span>@Model.Capacity</span>
+                            </div>
+                        }
+                        @if (!string.IsNullOrEmpty(Model.Location))
+                        {
+                            <div class="detail-item">
+                                <strong>Ubicación:</strong>
+                                <span>@Model.Location</span>
+                            </div>
+                        }
+                        <div class="detail-item">
+                            <strong>Estado:</strong>
+                            <span class="status @GetStatusClass(Model.Status.ToString())">
+                                @Model.StatusText
+                            </span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Creado:</strong>
+                            <span>@Model.CreatedDate.ToString("dd/MM/yyyy")</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Ocupación Actual:</strong>
+                            <span>@Model.CurrentOccupancy/@Model.Capacity</span>
+                        </div>
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrEmpty(Model.Description))
+                {
+                    <div class="description-preview">
+                        <strong>Descripción:</strong>
+                        <p>@(Model.Description.Length > 200 ? Model.Description.Substring(0, 200) + "..." : Model.Description)</p>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Impact Warning -->
+        <div class="impact-warning">
+            <div class="impact-header">
+                <h4><i class="fas fa-exclamation-circle"></i> Impacto de la Eliminación</h4>
+            </div>
+
+            <div class="impact-content">
+                <div class="impact-list">
+                    <div class="impact-item warning">
+                        <i class="fas fa-calendar-times"></i>
+                        <div>
+                            <strong>Reservas Activas</strong>
+                            <p>@Model.ActiveReservations reserva(s) activa(s) serán canceladas</p>
+                        </div>
+                    </div>
+
+                    <div class="impact-item info">
+                        <i class="fas fa-history"></i>
+                        <div>
+                            <strong>Historial</strong>
+                            <p>@Model.ReservationCount reserva(s) en el historial se mantendrán para auditoría</p>
+                        </div>
+                    </div>
+
+                    <div class="impact-item warning">
+                        <i class="fas fa-dollar-sign"></i>
+                        <div>
+                            <strong>Ingresos</strong>
+                            <p>Ingresos totales: @Model.TotalRevenue.ToString("C")</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Confirmation Form -->
+        <div class="confirmation-form">
+            <form asp-action="Delete" method="post">
+                <input asp-for="Id" type="hidden">
+
+                <div class="confirmation-checkbox">
+                    <div class="form-check">
+                        <input type="checkbox" id="confirmDelete" name="ConfirmDelete" class="form-check-input" required>
+                        <label for="confirmDelete" class="form-check-label">
+                            He leído y entiendo las consecuencias de eliminar este lugar
+                        </label>
+                    </div>
+                </div>
+
+                @if (Model.ActiveReservations > 0)
+                {
+                    <div class="additional-confirmation">
+                        <div class="form-check">
+                            <input type="checkbox" id="confirmCancelReservations" name="ConfirmCancelReservations" class="form-check-input" required>
+                            <label for="confirmCancelReservations" class="form-check-label">
+                                Confirmo que quiero cancelar las @Model.ActiveReservations reserva(s) activa(s)
+                            </label>
+                        </div>
+                    </div>
+                }
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-danger btn-lg" id="deleteButton" disabled>
+                        <i class="fas fa-trash"></i> Sí, Eliminar Lugar
+                    </button>
+                    <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-info btn-lg">
+                        <i class="fas fa-eye"></i> Revisar Detalles
+                    </a>
+                    <a asp-action="Index" class="btn btn-secondary btn-lg">
+                        <i class="fas fa-times"></i> Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+ 
+        function updateDeleteButton() {
+            const confirmDelete = document.getElementById('confirmDelete').checked;
+            const confirmCancelReservations = document.getElementById('confirmCancelReservations');
+            const deleteButton = document.getElementById('deleteButton');
+
+            let allConfirmed = confirmDelete;
+
+            if (confirmCancelReservations) {
+                allConfirmed = allConfirmed && confirmCancelReservations.checked;
+            }
+
+            deleteButton.disabled = !allConfirmed;
+        }
+
+        // Add event listeners to checkboxes
+        document.getElementById('confirmDelete').addEventListener('change', updateDeleteButton);
+
+        const confirmCancelReservations = document.getElementById('confirmCancelReservations');
+        if (confirmCancelReservations) {
+            confirmCancelReservations.addEventListener('change', updateDeleteButton);
+        }
+
+        // Add confirmation dialog on form submit
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const placeName = '@Model.Name';
+            if (!confirm(`¿Estás ABSOLUTAMENTE SEGURO de que quieres eliminar "${placeName}"?\n\nEsta acción NO se puede deshacer.`)) {
+                e.preventDefault();
+            }
+        });
+    </script>
+}

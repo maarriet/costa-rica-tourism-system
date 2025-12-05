@@ -1,0 +1,169 @@
+﻿@{
+    ViewData["Title"] = "Galería - Costa Rica";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="~/css/gallery.css" rel="stylesheet" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- Gallery Header -->
+<section class="gallery-header">
+    <div class="container">
+        <h1><i class="fas fa-camera"></i> Galería de Costa Rica</h1>
+        <p>Descubre la belleza natural y cultural de nuestro país</p>
+        <a href="@Url.Action("Tourism", "Home")" class="back-button">
+            <i class="fas fa-arrow-left"></i> Volver al Inicio
+        </a>
+    </div>
+</section>
+
+<!-- Filter Buttons -->
+<section class="filter-section">
+    <div class="container">
+        <div class="filter-buttons">
+            <button class="filter-btn active" data-filter="all">
+                <i class="fas fa-th"></i> Todos
+            </button>
+            <button class="filter-btn" data-filter="beaches">
+                <i class="fas fa-umbrella-beach"></i> Playas
+            </button>
+            <button class="filter-btn" data-filter="mountains">
+                <i class="fas fa-mountain"></i> Montañas
+            </button>
+            <button class="filter-btn" data-filter="volcanoes">
+                <i class="fas fa-fire"></i> Volcanes
+            </button>
+            <button class="filter-btn" data-filter="wildlife">
+                <i class="fas fa-paw"></i> Vida Silvestre
+            </button>
+            <button class="filter-btn" data-filter="adventures">
+                <i class="fas fa-hiking"></i> Aventuras
+            </button>
+        </div>
+    </div>
+</section>
+
+<!-- Image Gallery -->
+<section class="image-gallery-section">
+    <div class="container">
+        <div class="masonry-grid" id="galleryGrid">
+
+            <!-- Beach Images -->
+            <div class="gallery-item" data-category="beaches">
+                <img src="~/images/costa-rica/beaches/manuel-antonio.jpg" alt="Playa Manuel Antonio">
+                <div class="gallery-overlay">
+                    <h3>Playa Manuel Antonio</h3>
+                    <p>Parque Nacional Manuel Antonio</p>
+                    <div class="gallery-icons">
+                        <button class="view-btn" onclick="openModal('~/images/costa-rica/beaches/manuel-antonio.jpg', 'Playa Manuel Antonio')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="download-btn">
+                            <i class="fas fa-download"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="gallery-item" data-category="beaches">
+                <img src="~/images/costa-rica/beaches/tamarindo.jpg" alt="Playa Tamarindo">
+                <div class="gallery-overlay">
+                    <h3>Playa Tamarindo</h3>
+                    <p>Guanacaste Province</p>
+                    <div class="gallery-icons">
+                        <button class="view-btn" onclick="openModal('~/images/costa-rica/beaches/tamarindo.jpg', 'Playa Tamarindo')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="download-btn">
+                            <i class="fas fa-download"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mountain Images -->
+            <div class="gallery-item" data-category="mountains">
+                <img src="~/images/costa-rica/mountains/monteverde.jpg" alt="Monteverde Cloud Forest">
+                <div class="gallery-overlay">
+                    <h3>Bosque Nuboso Monteverde</h3>
+                    <p>Reserva Biológica</p>
+                    <div class="gallery-icons">
+                        <button class="view-btn" onclick="openModal('~/images/costa-rica/mountains/monteverde.jpg', 'Monteverde')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="download-btn">
+                            <i class="fas fa-download"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Volcano Images -->
+            <div class="gallery-item" data-category="volcanoes">
+                <img src="~/images/costa-rica/volcanoes/arenal.jpg" alt="Volcán Arenal">
+                <div class="gallery-overlay">
+                    <h3>Volcán Arenal</h3>
+                    <p>La Fortuna, Alajuela</p>
+                    <div class="gallery-icons">
+                        <button class="view-btn" onclick="openModal('~/images/costa-rica/volcanoes/arenal.jpg', 'Volcán Arenal')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="download-btn">
+                            <i class="fas fa-download"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Wildlife Images -->
+            <div class="gallery-item" data-category="wildlife">
+                <img src="~/images/costa-rica/wildlife/sloth.jpg" alt="Perezoso">
+                <div class="gallery-overlay">
+                    <h3>Perezoso de Tres Dedos</h3>
+                    <p>Fauna Típica de Costa Rica</p>
+                    <div class="gallery-icons">
+                        <button class="view-btn" onclick="openModal('~/images/costa-rica/wildlife/sloth.jpg', 'Perezoso')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="download-btn">
+                            <i class="fas fa-download"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Adventure Images -->
+            <div class="gallery-item" data-category="adventures">
+                <img src="~/images/costa-rica/adventures/canopy.jpg" alt="Canopy Tour">
+                <div class="gallery-overlay">
+                    <h3>Canopy Tour</h3>
+                    <p>Aventura en las Copas de los Árboles</p>
+                    <div class="gallery-icons">
+                        <button class="view-btn" onclick="openModal('~/images/costa-rica/adventures/canopy.jpg', 'Canopy Tour')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="download-btn">
+                            <i class="fas fa-download"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add more images as needed -->
+        </div>
+    </div>
+</section>
+
+<!-- Modal for Image Viewing -->
+<div id="imageModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <img id="modalImage" src="" alt="">
+        <div class="modal-caption">
+            <h3 id="modalTitle"></h3>
+        </div>
+    </div>
+</div>
+
+<script src="~/js/gallery.js"></script>
