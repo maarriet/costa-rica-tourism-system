@@ -1,3 +1,0 @@
-﻿<Project>
-  <Import Project="..\buildMultiTargeting\Sistema_GuiaLocal&amp;Turismo.props" />
-</Project>
