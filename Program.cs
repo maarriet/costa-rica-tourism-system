@@ -10,13 +10,27 @@ var builder = WebApplication.CreateBuilder(args);
 
 QuestPDF.Settings.License = LicenseType.Community;
 
-// Use Railway's automatically provided PostgreSQL variables
-var connectionString = Environment.GetEnvironmentVariable("DATABASE_PRIVATE_URL")
-    ?? Environment.GetEnvironmentVariable("DATABASE_URL")
-    ?? builder.Configuration.GetConnectionString("DefaultConnection");
+// Use Railway's individual PostgreSQL variables (these are working!)
+var host = Environment.GetEnvironmentVariable("PGHOST");
+var pgPort = Environment.GetEnvironmentVariable("PGPORT") ?? "5432";
+var database = Environment.GetEnvironmentVariable("PGDATABASE");
+var username = Environment.GetEnvironmentVariable("PGUSER");
+var password = Environment.GetEnvironmentVariable("PGPASSWORD");
 
-Console.WriteLine($"Using connection string source: {(Environment.GetEnvironmentVariable("DATABASE_PRIVATE_URL") != null ? "DATABASE_PRIVATE_URL" : "Fallback")}");
+string connectionString;
 
+if (!string.IsNullOrEmpty(host) && !string.IsNullOrEmpty(database) && !string.IsNullOrEmpty(username))
+{
+    // Railway PostgreSQL connection using individual variables
+    connectionString = $"Host={host};Port={pgPort};Database={database};Username={username};Password={password};SSL Mode=Require;Trust Server Certificate=true";
+    Console.WriteLine($"✅ Using Railway PostgreSQL: {host}:{pgPort}/{database}");
+}
+else
+{
+    // Fallback to local connection
+    connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    Console.WriteLine("⚠️ Using local connection string");
+}
 // Add services - PostgreSQL for Railway
 builder.Services.AddDbContext<TourismContext>(options =>
     options.UseNpgsql(connectionString));
