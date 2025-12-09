@@ -31,6 +31,8 @@ else
     connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
     Console.WriteLine("⚠️ Using local connection string");
 }
+// Configure Npgsql to handle DateTime properly
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 // Add services - PostgreSQL for Railway
 builder.Services.AddDbContext<TourismContext>(options =>
     options.UseNpgsql(connectionString));
