@@ -73,7 +73,7 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Dashboard}/{action=Index}/{id?}");
 
-// Auto-migrate and seed on Railway - Force database creation
+// Auto-migrate and seed on Railway - Force complete database recreation
 using (var scope = app.Services.CreateScope())
 {
     try
@@ -82,33 +82,22 @@ using (var scope = app.Services.CreateScope())
 
         Console.WriteLine("🔄 Starting database initialization...");
 
-        // Force database creation (bypasses migrations)
-        Console.WriteLine("🗄️ Ensuring database exists...");
+        // Force delete and recreate database completely
+        Console.WriteLine("🗑️ Deleting existing database...");
+        await context.Database.EnsureDeletedAsync();
+
+        Console.WriteLine("🗄️ Creating fresh database...");
         var created = await context.Database.EnsureCreatedAsync();
 
         if (created)
         {
-            Console.WriteLine("✅ Database created successfully!");
-        }
-        else
-        {
-            Console.WriteLine("📊 Database already exists");
+            Console.WriteLine("✅ Fresh database created successfully!");
         }
 
-        // Seed sample data if database is empty
-        Console.WriteLine("🌱 Checking if seeding is needed...");
-        var categoryCount = await context.Categories.CountAsync();
-
-        if (categoryCount == 0)
-        {
-            Console.WriteLine("🌱 Seeding sample data...");
-            await SeedSampleData(context);
-            Console.WriteLine("✅ Sample data seeded successfully!");
-        }
-        else
-        {
-            Console.WriteLine($"📊 Database already contains {categoryCount} categories, skipping seed.");
-        }
+        // Seed sample data
+        Console.WriteLine("🌱 Seeding sample data...");
+        await SeedSampleData(context);
+        Console.WriteLine("✅ Sample data seeded successfully!");
 
         Console.WriteLine("✅ Database initialized successfully!");
     }
