@@ -38,10 +38,10 @@
             <i class="fas fa-map-marked-alt"></i> Tourism CR
         </div>
         <ul class="nav-links" id="navLinks">
-            <li><a href="#dashboard" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-            <li><a href="#lugares"><i class="fas fa-map-marker-alt"></i> Lugares</a></li>
-            <li><a href="#categorias"><i class="fas fa-tags"></i> Categorías</a></li>
-            <li><a href="#reservas"><i class="fas fa-calendar-check"></i> Reservas</a></li>
+            <li><a href="/Dashboard" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+            <li><a href="/Places"><i class="fas fa-map-marker-alt"></i> Lugares</a></li>
+            <li><a href="/Categories"><i class="fas fa-tags"></i> Categorías</a></li>
+            <li><a href="/Reservations"><i class="fas fa-calendar-check"></i> Reservas</a></li>
             <li><a href="#reportes"><i class="fas fa-chart-bar"></i> Reportes</a></li>
         </ul>
         <div class="mobile-menu" id="mobileMenu">
@@ -52,12 +52,67 @@
     </div>
 </nav>
 
+
 <!-- Dashboard Section -->
 <section id="dashboard" class="container fade-in">
     <div class="section-header">
         <h2><i class="fas fa-tachometer-alt"></i> Dashboard de Control</h2>
         <p>Resumen general del sistema en tiempo real</p>
     </div>
+    <!-- API Widgets -->
+    <div class="api-widgets-section">
+        <div class="widget-grid">
+            <!-- Reloj en Tiempo Real -->
+            <div class="widget-card">
+                <h4><i class="fas fa-clock"></i> Hora Actual - Costa Rica</h4>
+                <div class="time-display">
+                    <div id="currentTime" class="time-text">--:--:--</div>
+                    <div id="currentDate" class="date-text">-- de ---- de ----</div>
+                    <div class="timezone-text">Zona Horaria: CST (UTC-6)</div>
+                </div>
+            </div>
+
+            <!-- Mapa de Costa Rica -->
+            <div class="widget-card">
+                <h4><i class="fas fa-map"></i> Mapa Interactivo - Costa Rica</h4>
+                <div class="map-container">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m2!1m1!1sCosta+Rica!2m1!1f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1ses!2scr!4v1639234567890!5m2!1ses!2scr"
+                            width="100%"
+                            height="200"
+                            style="border:0;"
+                            allowfullscreen=""
+                            loading="lazy">
+                    </iframe>
+                </div>
+            </div>
+
+            <!-- Información Turística -->
+            <div class="widget-card">
+                <h4><i class="fas fa-info-circle"></i> Info Turística</h4>
+                <div class="tourism-info">
+                    <div class="info-item">
+                        <i class="fas fa-thermometer-half"></i>
+                        <span>Temperatura promedio: 24°C - 30°C</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-umbrella"></i>
+                        <span>Temporada seca: Dic - Abr</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-leaf"></i>
+                        <span>Temporada verde: May - Nov</span>
+                    </div>
+                </div>
+            </div>
+            <div class="widget-card">
+                <h4><i class="fas fa-cloud-sun"></i> Clima - San José</h4>
+                <div id="weatherWidget" class="weather-display">
+                    <div class="weather-loading">Cargando información del clima...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <!-- Quick Stats -->
     <div class="dashboard-stats">
@@ -102,7 +157,55 @@
             </div>
         </div>
     </div>
+    <!-- Quick Access Buttons -->
+    <div class="quick-access-section">
+        <h3><i class="fas fa-rocket"></i> Acceso Rápido</h3>
+        <div class="quick-access-grid">
+            <a href="/Places" class="quick-access-card">
+                <div class="quick-icon bg-primary">
+                    <i class="fas fa-map-marker-alt"></i>
+                </div>
+                <div class="quick-info">
+                    <h4>Gestionar Lugares</h4>
+                    <p>Ver, agregar y editar lugares turísticos</p>
+                </div>
+                <i class="fas fa-arrow-right"></i>
+            </a>
 
+            <a href="/Categories" class="quick-access-card">
+                <div class="quick-icon bg-success">
+                    <i class="fas fa-tags"></i>
+                </div>
+                <div class="quick-info">
+                    <h4>Administrar Categorías</h4>
+                    <p>Organizar tipos de lugares turísticos</p>
+                </div>
+                <i class="fas fa-arrow-right"></i>
+            </a>
+
+            <a href="/Reservations" class="quick-access-card">
+                <div class="quick-icon bg-warning">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <div class="quick-info">
+                    <h4>Control de Reservas</h4>
+                    <p>Gestionar reservas y check-ins</p>
+                </div>
+                <i class="fas fa-arrow-right"></i>
+            </a>
+
+            <a href="#reportes" class="quick-access-card">
+                <div class="quick-icon bg-info">
+                    <i class="fas fa-chart-bar"></i>
+                </div>
+                <div class="quick-info">
+                    <h4>Ver Reportes</h4>
+                    <p>Análisis y estadísticas del sistema</p>
+                </div>
+                <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+    </div>
     <!-- Charts and Recent Activity -->
     <div class="dashboard-content">
         <div class="chart-section">

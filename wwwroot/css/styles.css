@@ -1513,4 +1513,237 @@ footer {
         width: 95%;
     }
 }
+/* Quick Access Section */
+.quick-access-section {
+    margin: 2rem 0;
+    padding: 2rem;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
 
+    .quick-access-section h3 {
+        color: #2c3e50;
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+    }
+
+.quick-access-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.quick-access-card {
+    display: flex;
+    align-items: center;
+    padding: 1.5rem;
+    background: white;
+    border-radius: 12px;
+    text-decoration: none;
+    color: inherit;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+    border: 1px solid #e9ecef;
+}
+
+    .quick-access-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        text-decoration: none;
+        color: inherit;
+    }
+
+.quick-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    font-size: 1.5rem;
+    color: white;
+}
+
+.quick-info {
+    flex: 1;
+}
+
+    .quick-info h4 {
+        margin: 0 0 0.5rem 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #2c3e50;
+    }
+
+    .quick-info p {
+        margin: 0;
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+
+.quick-access-card .fa-arrow-right {
+    color: #6c757d;
+    font-size: 1.2rem;
+    transition: transform 0.3s ease;
+}
+
+.quick-access-card:hover .fa-arrow-right {
+    transform: translateX(5px);
+}
+
+/* API Widgets Section */
+.api-widgets-section {
+    margin: 2rem 0;
+}
+
+.widget-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.widget-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    border: 1px solid #e9ecef;
+}
+
+    .widget-card h4 {
+        margin: 0 0 1rem 0;
+        color: #2c3e50;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+/* Time Widget */
+.time-display {
+    text-align: center;
+    padding: 1rem 0;
+}
+
+.time-text {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #007bff;
+    font-family: 'Courier New', monospace;
+    margin-bottom: 0.5rem;
+}
+
+.date-text {
+    font-size: 1.2rem;
+    color: #495057;
+    margin-bottom: 0.5rem;
+}
+
+.timezone-text {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+/* Map Widget */
+.map-container {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+    .map-container iframe {
+        border-radius: 8px;
+    }
+
+/* Tourism Info Widget */
+.tourism-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid #007bff;
+}
+
+    .info-item i {
+        color: #007bff;
+        width: 20px;
+        text-align: center;
+    }
+
+    .info-item span {
+        color: #495057;
+        font-size: 0.95rem;
+    }
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .quick-access-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .widget-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .time-text {
+        font-size: 2rem;
+    }
+
+    .quick-access-card {
+        padding: 1rem;
+    }
+
+    .quick-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+    }
+}
+
+/* Fix for view buttons */
+.btn-view {
+    background-color: #17a2b8;
+    color: white;
+    border: none;
+    padding: 0.5rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+    .btn-view:hover {
+        background-color: #138496;
+        transform: translateY(-1px);
+    }
+
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-icon {
+    width: 35px;
+    height: 35px;
+    border-radius: 6px;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+    .btn-icon:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }

@@ -547,6 +547,219 @@ function getNotificationIcon(type) {
 }
 
 // Utility Functions
+
+// Reloj en tiempo real
+function updateTime() {
+    const now = new Date();
+
+    // Configurar para zona horaria de Costa Rica (CST - UTC-6)
+    const costaRicaTime = new Date(now.toLocaleString("en-US", { timeZone: "America/Costa_Rica" }));
+
+    // Formatear hora
+    const timeString = costaRicaTime.toLocaleTimeString('es-CR', {
+        hour12: false,
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+    });
+
+    // Formatear fecha
+    const dateString = costaRicaTime.toLocaleDateString('es-CR', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+
+    // Actualizar elementos
+    const timeElement = document.getElementById('currentTime');
+    const dateElement = document.getElementById('currentDate');
+
+    if (timeElement) timeElement.textContent = timeString;
+    if (dateElement) dateElement.textContent = dateString;
+}
+
+// Inicializar reloj
+document.addEventListener('DOMContentLoaded', function () {
+    updateTime();
+    setInterval(updateTime, 1000); // Actualizar cada segundo
+});
+
+// Funciones para los botones de vista (arreglar los botones que no funcionan)
+function viewPlace(placeCode) {
+    // Redirigir a la vista de detalles del lugar
+    window.location.href = `/Places/Details/${placeCode}`;
+}
+
+function editPlace(placeCode) {
+    // Redirigir a la vista de edición
+    window.location.href = `/Places/Edit/${placeCode}`;
+}
+
+function deletePlace(placeCode) {
+    if (confirm('¿Estás seguro de que deseas eliminar este lugar?')) {
+        // Enviar petición de eliminación
+        fetch(`/Places/Delete/${placeCode}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+            .then(response => {
+                if (response.ok) {
+                    location.reload();
+                } else {
+                    alert('Error al eliminar el lugar');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al eliminar el lugar');
+            });
+    }
+}
+
+// Funciones para reservas
+function viewReservation(reservationId) {
+    window.location.href = `/Reservations/Details/${reservationId}`;
+}
+
+function editReservation(reservationId) {
+    window.location.href = `/Reservations/Edit/${reservationId}`;
+}
+
+function checkIn(reservationId) {
+    if (confirm('¿Confirmar check-in para esta reserva?')) {
+        fetch(`/Reservations/CheckIn/${reservationId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+            .then(response => {
+                if (response.ok) {
+                    location.reload();
+                } else {
+                    alert('Error al realizar check-in');
+                }
+            });
+    }
+}
+
+function checkOut(reservationId) {
+    if (confirm('¿Confirmar check-out para esta reserva?')) {
+        fetch(`/Reservations/CheckOut/${reservationId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+            .then(response => {
+                if (response.ok) {
+                    location.reload();
+                } else {
+                    alert('Error al realizar check-out');
+                }
+            });
+    }
+}
+
+// Funciones para categorías
+function editCategory(categoryId) {
+    window.location.href = `/Categories/Edit/${categoryId}`;
+}
+
+function deleteCategory(categoryId) {
+    if (confirm('¿Estás seguro de que deseas eliminar esta categoría?')) {
+        fetch(`/Categories/Delete/${categoryId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+            .then(response => {
+                if (response.ok) {
+                    location.reload();
+                } else {
+                    alert('Error al eliminar la categoría');
+                }
+            });
+    }
+}
+
+// Navegación suave para enlaces internos
+document.addEventListener('DOMContentLoaded', function () {
+    // Manejar navegación del menú
+    const navLinks = document.querySelectorAll('.nav-links a');
+    navLinks.forEach(link => {
+        link.addEventListener('click', function (e) {
+            // Remover clase active de todos los enlaces
+            navLinks.forEach(l => l.classList.remove('active'));
+            // Agregar clase active al enlace clickeado
+            this.classList.add('active');
+        });
+    });
+
+    // Menú móvil
+    const mobileMenu = document.getElementById('mobileMenu');
+    const navLinksContainer = document.getElementById('navLinks');
+
+    if (mobileMenu) {
+        mobileMenu.addEventListener('click', function () {
+            navLinksContainer.classList.toggle('active');
+            this.classList.toggle('active');
+        });
+    }
+});
+
+// Función para modales
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+// Widget del clima (usando OpenWeatherMap API - necesitas una API key gratuita)
+async function loadWeather() {
+    try {
+        // Reemplaza 'TU_API_KEY' con una clave real de OpenWeatherMap
+        const apiKey = 'TU_API_KEY';
+        const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=San Jose,CR&appid=${apiKey}&units=metric&lang=es`);
+        const data = await response.json();
+
+        const weatherWidget = document.getElementById('weatherWidget');
+        if (weatherWidget && data.main) {
+            weatherWidget.innerHTML = `
+                <div class="weather-info">
+                    <div class="weather-temp">${Math.round(data.main.temp)}°C</div>
+                    <div class="weather-desc">${data.weather[0].description}</div>
+                    <div class="weather-details">
+                        <span>Humedad: ${data.main.humidity}%</span>
+                        <span>Viento: ${data.wind.speed} m/s</span>
+                    </div>
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.log('No se pudo cargar la información del clima');
+        const weatherWidget = document.getElementById('weatherWidget');
+        if (weatherWidget) {
+            weatherWidget.innerHTML = '<div class="weather-error">Información del clima no disponible</div>';
+        }
+    }
+}
+
+// Cargar clima al inicializar
+document.addEventListener('DOMContentLoaded', function () {
+    loadWeather();
+});
+
+// Cerrar modal al hacer click fuera
+window.addEventListener('click', function (event) {
+    if (event.target.classList.contains('modal')) {
+        event.target.style.display = 'none';
+    }
+});
 function formatCurrency(amount) {
     return new Intl.NumberFormat('es-CR', {
         style: 'currency',
