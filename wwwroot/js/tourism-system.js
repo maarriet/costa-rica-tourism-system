@@ -719,6 +719,36 @@ function closeModal(modalId) {
         modal.style.display = 'none';
     }
 }
+// Función para formatear moneda correctamente
+function formatCurrency(amount) {
+    return new Intl.NumberFormat('es-CR', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+    }).format(amount).replace('US$', '$');
+}
+
+// Función para actualizar todos los elementos de moneda en la página
+function updateCurrencyDisplay() {
+    // Buscar todos los elementos que contengan el símbolo ¤
+    const currencyElements = document.querySelectorAll('*');
+    currencyElements.forEach(element => {
+        if (element.textContent && element.textContent.includes('¤')) {
+            element.textContent = element.textContent.replace(/¤([\d,]+(?:\.\d{2})?)/g, (match, amount) => {
+                const numericAmount = parseFloat(amount.replace(/,/g, ''));
+                return '$' + numericAmount.toLocaleString('en-US');
+            });
+        }
+    });
+}
+
+// Ejecutar al cargar la página
+document.addEventListener('DOMContentLoaded', function () {
+    updateCurrencyDisplay();
+    updateTime();
+    setInterval(updateTime, 1000);
+});
 // Widget del clima (usando OpenWeatherMap API - necesitas una API key gratuita)
 async function loadWeather() {
     try {

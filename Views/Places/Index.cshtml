@@ -17,6 +17,21 @@
 }
 
 <div class="container">
+    <!-- Page Header with Breadcrumb -->
+    <div class="page-header">
+        <div class="breadcrumb-section">
+            <a href="/Dashboard" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Volver al Dashboard
+            </a>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/Dashboard">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Lugares Turísticos</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
     <div class="section-header">
         <h2><i class="fas fa-map-marker-alt"></i> Gestión de Lugares Turísticos</h2>
         <div class="section-actions">
@@ -111,7 +126,7 @@
                             <td>
                                 <span class="badge badge-primary">@place.CategoryName</span>
                             </td>
-                            <td><strong>@place.Price.ToString("C")</strong></td>
+                            <td><strong class="currency">@place.Price.ToString("C", new System.Globalization.CultureInfo("en-US"))</strong></td>
                             <td>
                                 <span class="status @GetStatusClass(place.Status.ToString())">
                                     @place.StatusText
