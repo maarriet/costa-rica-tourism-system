@@ -73,20 +73,41 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Dashboard}/{action=Index}/{id?}");
 
-// Auto-migrate and seed on Railway
+// Auto-migrate and seed on Railway - Force database creation
 using (var scope = app.Services.CreateScope())
 {
     try
     {
         var context = scope.ServiceProvider.GetRequiredService<TourismContext>();
 
-        // Apply migrations
-        await context.Database.MigrateAsync();
+        Console.WriteLine("🔄 Starting database initialization...");
+
+        // Force database creation (bypasses migrations)
+        Console.WriteLine("🗄️ Ensuring database exists...");
+        var created = await context.Database.EnsureCreatedAsync();
+
+        if (created)
+        {
+            Console.WriteLine("✅ Database created successfully!");
+        }
+        else
+        {
+            Console.WriteLine("📊 Database already exists");
+        }
 
         // Seed sample data if database is empty
-        if (!await context.Categories.AnyAsync())
+        Console.WriteLine("🌱 Checking if seeding is needed...");
+        var categoryCount = await context.Categories.CountAsync();
+
+        if (categoryCount == 0)
         {
+            Console.WriteLine("🌱 Seeding sample data...");
             await SeedSampleData(context);
+            Console.WriteLine("✅ Sample data seeded successfully!");
+        }
+        else
+        {
+            Console.WriteLine($"📊 Database already contains {categoryCount} categories, skipping seed.");
         }
 
         Console.WriteLine("✅ Database initialized successfully!");
@@ -94,8 +115,11 @@ using (var scope = app.Services.CreateScope())
     catch (Exception ex)
     {
         Console.WriteLine($"❌ Database error: {ex.Message}");
+        Console.WriteLine($"Stack trace: {ex.StackTrace}");
+        // Don't throw - let app start anyway
     }
 }
+
 
 // Use Railway's PORT environment variable
 var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
