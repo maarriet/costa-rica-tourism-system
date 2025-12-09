@@ -119,7 +119,7 @@ app.Run();
 // Seed method
 static async Task SeedSampleData(TourismContext context)
 {
-    // Categories
+    // Categories //prueba
     var categories = new[]
     {
         new Category { Name = "Hoteles y Hospedajes", Description = "Hoteles, hostales, cabañas y alojamientos turísticos", Icon = "fas fa-bed", Color = "#007bff", IsActive = true },
