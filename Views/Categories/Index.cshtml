@@ -1,14 +1,40 @@
 ﻿@model CategoryListViewModel
 @{
     ViewData["Title"] = "Gestión de Categorías";
-    string GetStatusClass(bool isActive) => isActive ? "status-available" : "status-inactive";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@functions {
+    string GetStatusClass(bool isActive)
+    {
+        return isActive ? "status-available" : "status-inactive";
+    }
 }
 
 @section Styles {
     <link href="~/css/styles.css" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 }
 
+<!-- Add breadcrumb navigation like other pages -->
+<nav class="breadcrumb-nav">
+    <div class="container">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="/Dashboard"><i class="fas fa-home"></i> Dashboard</a>
+            </li>
+            <li class="breadcrumb-item active">
+                <i class="fas fa-tags"></i> Categorías
+            </li>
+        </ol>
+        <a href="/Dashboard" class="btn btn-outline-secondary btn-sm">
+            <i class="fas fa-arrow-left"></i> Volver al Dashboard
+        </a>
+    </div>
+</nav>
+
+<div class="container">
 <div class="container">
     <div class="section-header">
         <h2><i class="fas fa-tags"></i> Gestión de Categorías</h2>
