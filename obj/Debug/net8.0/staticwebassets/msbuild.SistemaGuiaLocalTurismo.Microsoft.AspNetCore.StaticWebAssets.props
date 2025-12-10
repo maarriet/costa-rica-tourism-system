@@ -48,8 +48,8 @@
       <RelatedAsset></RelatedAsset>
       <AssetTraitName></AssetTraitName>
       <AssetTraitValue></AssetTraitValue>
-      <Fingerprint>sh6usk7dh7</Fingerprint>
-      <Integrity>oGdYGDSjz/ThxN72FarWNPpdaR27OAehhKarlDSd1s8=</Integrity>
+      <Fingerprint>npibk94y0w</Fingerprint>
+      <Integrity>e0t50wIzUlQ2TyqGpKig5iGJC9XNhkG9QVCpStblMtk=</Integrity>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\css\styles.css'))</OriginalItemSpec>
@@ -300,8 +300,8 @@
       <RelatedAsset></RelatedAsset>
       <AssetTraitName></AssetTraitName>
       <AssetTraitValue></AssetTraitValue>
-      <Fingerprint>j8kpjx9lsv</Fingerprint>
-      <Integrity>Teb8co/MgFiHNcj+nRpST/XEI2WfJ1A9anN9fMner+M=</Integrity>
+      <Fingerprint>h5354tggik</Fingerprint>
+      <Integrity>y0j6G29QgCzvtJU6Aa4uU0Sfb7r3qOjpXB3E6/evgZA=</Integrity>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\js\tourism-system.js'))</OriginalItemSpec>
