@@ -27,6 +27,7 @@ namespace Sistema_GuiaLocal_Turismo.ViewModels
         public bool HasActiveFilters => !string.IsNullOrEmpty(SearchTerm) || StatusFilter.HasValue;
         public bool HasResults => Categories != null && Categories.Any();
 
+        public string FormattedTotalRevenue => $"${TotalRevenueFromCategories:N2}";
         public string FilterSummary
         {
             get

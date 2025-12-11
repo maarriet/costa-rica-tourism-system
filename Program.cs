@@ -5,10 +5,16 @@ using Sistema_GuiaLocal_Turismo.Services;
 using Microsoft.EntityFrameworkCore;
 using QuestPDF.Infrastructure;
 using Sistema_GuiaLocal_Turismo.Models;
+using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
 QuestPDF.Settings.License = LicenseType.Community;
+
+// Configurar cultura para USD
+var cultureInfo = new CultureInfo("en-US");
+CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
 
 // Use Railway's individual PostgreSQL variables (these are working!)
 var host = Environment.GetEnvironmentVariable("PGHOST");
@@ -53,6 +59,14 @@ builder.Services.AddScoped<IPlaceService, PlaceService>();
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
+
+// Configurar localización
+app.UseRequestLocalization(new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new Microsoft.AspNetCore.Localization.RequestCulture("en-US"),
+    SupportedCultures = new[] { cultureInfo },
+    SupportedUICultures = new[] { cultureInfo }
+});
 
 // Configure pipeline
 if (!app.Environment.IsDevelopment())

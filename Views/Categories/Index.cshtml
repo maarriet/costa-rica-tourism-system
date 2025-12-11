@@ -262,8 +262,8 @@
             <div class="stat-label">Lugares Totales</div>
         </div>
         <div class="stat-card">
-            <div class="stat-number">@Model.TotalRevenueFromCategories.ToString("C")</div>
-            <div class="stat-label">Ingresos Totales</div>
+            <<div class="stat-number">@Model.FormattedTotalRevenue</div>
+            <td><strong>@category.FormattedRevenue</strong></td>
         </div>
         <div class="stat-card">
             <div class="stat-number">@Model.TotalInactiveCategories</div>
