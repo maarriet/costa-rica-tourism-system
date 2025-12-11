@@ -1747,7 +1747,7 @@ footer {
         transform: translateY(-2px);
         box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     }
-/* Add this to your styles.css */
+
 .compact-header {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
