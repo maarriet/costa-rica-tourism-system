@@ -17,7 +17,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        /* Essential CSS to ensure proper display */
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -50,12 +49,6 @@
             color: white;
         }
 
-            .btn-primary:hover {
-                background-color: #0056b3;
-                color: white;
-                text-decoration: none;
-            }
-
         .stats-overview {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -68,7 +61,6 @@
             padding: 25px;
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            border-left: 4px solid #007bff;
         }
 
         .stat-number {
@@ -99,18 +91,11 @@
                 padding: 15px;
                 text-align: left;
                 font-weight: 600;
-                color: #333;
-                border-bottom: 2px solid #dee2e6;
             }
 
             .data-table td {
                 padding: 15px;
                 border-bottom: 1px solid #eee;
-                vertical-align: middle;
-            }
-
-            .data-table tr:hover {
-                background-color: #f8f9fa;
             }
 
         .status-available {
@@ -119,7 +104,6 @@
             padding: 6px 12px;
             border-radius: 20px;
             font-size: 12px;
-            font-weight: 500;
         }
 
         .status-inactive {
@@ -128,7 +112,6 @@
             padding: 6px 12px;
             border-radius: 20px;
             font-size: 12px;
-            font-weight: 500;
         }
 
         .action-buttons {
@@ -142,11 +125,11 @@
             border-radius: 6px;
             cursor: pointer;
             text-decoration: none;
+            width: 35px;
+            height: 35px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 35px;
-            height: 35px;
         }
 
         .btn-edit {
@@ -154,92 +137,17 @@
             color: #212529;
         }
 
-            .btn-edit:hover {
-                background-color: #e0a800;
-                color: #212529;
-            }
-
         .btn-view {
             background-color: #17a2b8;
             color: white;
         }
 
-            .btn-view:hover {
-                background-color: #138496;
-                color: white;
-            }
-
         .btn-delete {
             background-color: #dc3545;
             color: white;
         }
-
-            .btn-delete:hover {
-                background-color: #c82333;
-                color: white;
-            }
-
-        .breadcrumb-nav {
-            background-color: #f8f9fa;
-            padding: 15px 0;
-            margin-bottom: 20px;
-            border-bottom: 1px solid #dee2e6;
-        }
-
-        .breadcrumb {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin: 0;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        .breadcrumb-items {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .breadcrumb a {
-            text-decoration: none;
-            color: #007bff;
-        }
-
-            .breadcrumb a:hover {
-                color: #0056b3;
-            }
-
-        .btn-outline-secondary {
-            border: 1px solid #6c757d;
-            color: #6c757d;
-            background: transparent;
-            padding: 8px 16px;
-            font-size: 14px;
-        }
-
-            .btn-outline-secondary:hover {
-                background-color: #6c757d;
-                color: white;
-                text-decoration: none;
-            }
     </style>
 }
-
-<!-- Breadcrumb Navigation -->
-<nav class="breadcrumb-nav">
-    <div class="breadcrumb">
-        <div class="breadcrumb-items">
-            <a href="/Dashboard"><i class="fas fa-home"></i> Dashboard</a>
-            <span>/</span>
-            <span><i class="fas fa-tags"></i> Categorías</span>
-        </div>
-        <a href="/Dashboard" class="btn btn-outline-secondary">
-            <i class="fas fa-arrow-left"></i> Volver al Dashboard
-        </a>
-    </div>
-</nav>
 
 <div class="container">
     <div class="section-header">
@@ -262,8 +170,8 @@
             <div class="stat-label">Lugares Totales</div>
         </div>
         <div class="stat-card">
-            <<div class="stat-number">@Model.FormattedTotalRevenue</div>
-            <td><strong>@category.FormattedRevenue</strong></td>
+            <div class="stat-number">$@Model.TotalRevenueFromCategories.ToString("N2")</div>
+            <div class="stat-label">Ingresos Totales</div>
         </div>
         <div class="stat-card">
             <div class="stat-number">@Model.TotalInactiveCategories</div>
@@ -306,7 +214,7 @@
                                 }
                                 else
                                 {
-                                    <span style="color: #999; font-style: italic;">Sin descripción</span>
+                                    <span style="color: #999;">Sin descripción</span>
                                 }
                             </td>
                             <td>
@@ -316,7 +224,7 @@
                             </td>
                             <td><strong>@category.PlaceCount</strong></td>
                             <td><strong>@category.ReservationCount</strong></td>
-                            <td><strong>@category.Revenue.ToString("C")</strong></td>
+                            <td><strong>$@category.Revenue.ToString("N2")</strong></td>
                             <td>
                                 <div class="action-buttons">
                                     <a asp-action="Edit" asp-route-id="@category.Id" class="btn-icon btn-edit" title="Editar">
@@ -336,9 +244,13 @@
                 else
                 {
                     <tr>
-                        <td colspan="7" style="text-align: center; padding: 40px; color: #999;">
-                            <i class="fas fa-tags" style="font-size: 3rem; margin-bottom: 15px; display: block;"></i>
-                            No hay categorías registradas
+                        <td colspan="7" style="text-align: center; padding: 40px;">
+                            <i class="fas fa-tags" style="font-size: 3rem; color: #ddd; margin-bottom: 15px; display: block;"></i>
+                            <h3>No hay categorías registradas</h3>
+                            <p>Comienza agregando tu primera categoría</p>
+                            <a asp-action="Create" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Agregar Primera Categoría
+                            </a>
                         </td>
                     </tr>
                 }
@@ -349,7 +261,6 @@
 
 @section Scripts {
     <script>
-        // Add any JavaScript functionality here if needed
         console.log('Categories page loaded successfully');
     </script>
 }
