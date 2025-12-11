@@ -1,7 +1,7 @@
 ﻿@model ReservationListViewModel
 @{
     ViewData["Title"] = "Gestión de Reservas";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = "/Views/Shared/_Layout.cshtml";
 
     string GetStatusClass(ReservationStatus status) => status switch
     {
@@ -23,24 +23,56 @@
 }
 
 @section styles {
-    <link href="~/css/reservations.css" rel="stylesheet" />
+    <link href="~/css/styles.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 }
 
-<!-- Rest of your HTML content -->
-<nav class="breadcrumb-nav">
-    <div class="breadcrumb">
-        <div class="breadcrumb-items">
-            <a href="/Dashboard"><i class="fas fa-home"></i> Dashboard</a>
-            <span>/</span>
-            <span><i class="fas fa-calendar-check"></i> Reservas</span>
+<!-- Header Completo (igual que Dashboard y Categories) -->
+<header>
+    <div class="header-content">
+        <h1>Sistema de Guía Local y Turismo</h1>
+        <p>Gestión completa del turismo local en Costa Rica</p>
+        <div class="header-stats">
+            <div class="stat-box">
+                <i class="fas fa-map-marker-alt"></i>
+                <span>125 Lugares</span>
+            </div>
+            <div class="stat-box">
+                <i class="fas fa-calendar-check"></i>
+                <span>89 Reservas Activas</span>
+            </div>
+            <div class="stat-box">
+                <i class="fas fa-users"></i>
+                <span>1,234 Usuarios</span>
+            </div>
         </div>
-        <a href="/Dashboard" class="btn btn-outline-secondary">
-            <i class="fas fa-arrow-left"></i> Volver al Dashboard
-        </a>
+    </div>
+</header>
+
+<!-- Navigation -->
+<nav>
+    <div class="nav-container">
+        <div class="logo">
+            <i class="fas fa-map-marked-alt"></i> Tourism CR
+        </div>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="/Dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+            <li><a href="/Places"><i class="fas fa-map-marker-alt"></i> Lugares</a></li>
+            <li><a href="/Categories"><i class="fas fa-tags"></i> Categorías</a></li>
+            <li><a href="/Reservations" class="active"><i class="fas fa-calendar-check"></i> Reservas</a></li>
+            <li><a href="/Reports"><i class="fas fa-chart-bar"></i> Reportes</a></li>
+        </ul>
+        <div class="mobile-menu" id="mobileMenu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
     </div>
 </nav>
 
-<div class="container">
+<!-- Sección de Reservas -->
+<section id="reservas" class="container fade-in">
     <div class="section-header">
         <h2><i class="fas fa-calendar-check"></i> Gestión de Reservas</h2>
         <div class="section-actions">
@@ -123,10 +155,10 @@
                             <td><strong>$@reservation.TotalAmount.ToString("N2")</strong></td>
                             <td>
                                 <div class="action-buttons">
-                                    <a asp-action="Edit" asp-route-id="@reservation.Id" class="btn btn-sm btn-warning">
+                                    <a asp-action="Edit" asp-route-id="@reservation.Id" class="btn-icon btn-edit" title="Editar">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <a asp-action="Details" asp-route-id="@reservation.Id" class="btn btn-sm btn-info">
+                                    <a asp-action="Details" asp-route-id="@reservation.Id" class="btn-icon btn-view" title="Ver detalles">
                                         <i class="fas fa-eye"></i>
                                     </a>
                                 </div>
@@ -152,9 +184,10 @@
             </tbody>
         </table>
     </div>
-</div>
+</section>
 
 @section Scripts {
+    <script src="~/js/tourism-system.js"></script>
     <script>
         function exportReservations() {
             window.open('/Reservations/Export', '_blank');
