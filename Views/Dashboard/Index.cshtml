@@ -162,10 +162,49 @@
     <div class="quick-access-section">
         <h3><i class="fas fa-rocket"></i> Acceso Rápido</h3>
         <div class="quick-access-grid">
-            <a href="@Url.Action("Index", "Places")" class="quick-access-card">
-                <a href="@Url.Action("Index", "Categories")" class="quick-access-card">
-                    <a href="@Url.Action("Index", "Reservations")" class="quick-access-card">
-                        <a href="@Url.Action("Index", "Reports")" class="quick-access-card">
+            <a href="/Places" class="quick-access-card">
+                <div class="quick-icon bg-primary">
+                    <i class="fas fa-map-marker-alt"></i>
+                </div>
+                <div class="quick-info">
+                    <h4>Gestionar Lugares</h4>
+                    <p>Ver, agregar y editar lugares turísticos</p>
+                </div>
+                <i class="fas fa-arrow-right"></i>
+            </a>
+
+            <a href="/Categories" class="quick-access-card">
+                <div class="quick-icon bg-success">
+                    <i class="fas fa-tags"></i>
+                </div>
+                <div class="quick-info">
+                    <h4>Administrar Categorías</h4>
+                    <p>Organizar tipos de lugares turísticos</p>
+                </div>
+                <i class="fas fa-arrow-right"></i>
+            </a>
+
+            <a href="/Reservations" class="quick-access-card">
+                <div class="quick-icon bg-warning">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <div class="quick-info">
+                    <h4>Control de Reservas</h4>
+                    <p>Gestionar reservas y check-ins</p>
+                </div>
+                <i class="fas fa-arrow-right"></i>
+            </a>
+
+            <a href="#reportes" class="quick-access-card">
+                <div class="quick-icon bg-info">
+                    <i class="fas fa-chart-bar"></i>
+                </div>
+                <div class="quick-info">
+                    <h4>Ver Reportes</h4>
+                    <p>Análisis y estadísticas del sistema</p>
+                </div>
+                <i class="fas fa-arrow-right"></i>
+            </a>
         </div>
     </div>
 
