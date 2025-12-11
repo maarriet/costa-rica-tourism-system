@@ -13,6 +13,7 @@
 
     <!-- Only render one styles section -->
     @await RenderSectionAsync("styles", required: false)
+   
 </head>
 <body>
     <header>
@@ -36,5 +37,39 @@
 
     <!-- Add this line to render the Scripts section -->
     @await RenderSectionAsync("Scripts", required: false)
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Script para el gráfico de categorías
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('categoryChart');
+            if (ctx) {
+                new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['Hoteles', 'Restaurantes', 'Aventura', 'Cultura', 'Naturaleza'],
+                        datasets: [{
+                            data: [30, 25, 20, 15, 10],
+                            backgroundColor: [
+                                '#00695c',
+                                '#26a69a',
+                                '#ff6f00',
+                                '#1976d2',
+                                '#388e3c'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>
