@@ -1,0 +1,188 @@
+﻿/* Reservations Page Styles */
+body {
+    background: #f8f9fa !important;
+    font-family: 'Poppins', sans-serif !important;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+    .section-header h2 {
+        margin: 0;
+        color: #333;
+        font-size: 1.8rem;
+    }
+
+.section-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    text-decoration: none;
+    display: inline-block;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    color: white;
+}
+
+.btn-info {
+    background-color: #17a2b8;
+    color: white;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+
+.btn-outline-secondary {
+    border: 1px solid #6c757d;
+    color: #6c757d;
+    background: transparent;
+}
+
+.btn:hover {
+    opacity: 0.9;
+    text-decoration: none;
+}
+
+.stats-overview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.stat-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #007bff;
+    color: white;
+    font-size: 1.2rem;
+}
+
+.stat-content {
+    flex: 1;
+}
+
+.stat-number {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+    margin: 0;
+}
+
+.stat-label {
+    color: #666;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.table-container {
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+    .data-table th {
+        background-color: #f8f9fa;
+        padding: 12px;
+        text-align: left;
+        font-weight: 600;
+        color: #333;
+        border-bottom: 2px solid #dee2e6;
+        font-size: 0.85rem;
+    }
+
+    .data-table td {
+        padding: 12px;
+        border-bottom: 1px solid #eee;
+        vertical-align: middle;
+    }
+
+    .data-table tr:hover {
+        background-color: #f8f9fa;
+    }
+
+.empty-state {
+    text-align: center;
+    padding: 40px;
+}
+
+    .empty-state i {
+        font-size: 3rem;
+        color: #ddd;
+        margin-bottom: 15px;
+        display: block;
+    }
+
+.breadcrumb-nav {
+    background-color: #f8f9fa;
+    padding: 15px 0;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.breadcrumb {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.breadcrumb-items {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.breadcrumb a {
+    text-decoration: none;
+    color: #007bff;
+}
+
+    .breadcrumb a:hover {
+        color: #0056b3;
+    }
