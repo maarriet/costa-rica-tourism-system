@@ -1,33 +1,31 @@
 ﻿@{
     ViewData["Title"] = "Sistema de Guía Local y Turismo - Costa Rica";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = "/Views/Shared/_Layout.cshtml";
 }
 
 @section Styles {
-    <link href="~/css/styles.css" rel="stylesheet" />
+    <link href="/css/styles.css" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 }
 
-<!-- Compact Header -->
-<header class="compact-header">
+<!-- Header -->
+<header>
     <div class="header-content">
-        <div class="header-main">
-            <h1><i class="fas fa-map-marked-alt"></i> Sistema de Turismo - Costa Rica</h1>
-            <p>Gestión completa del turismo local</p>
-        </div>
-        <div class="header-stats-mini">
-            <div class="stat-mini">
+        <h1>Sistema de Guía Local y Turismo</h1>
+        <p>Gestión completa del turismo local en Costa Rica</p>
+        <div class="header-stats">
+            <div class="stat-box">
                 <i class="fas fa-map-marker-alt"></i>
                 <span>125 Lugares</span>
             </div>
-            <div class="stat-mini">
+            <div class="stat-box">
                 <i class="fas fa-calendar-check"></i>
-                <span>89 Reservas</span>
+                <span>89 Reservas Activas</span>
             </div>
-            <div class="stat-mini">
-                <i class="fas fa-dollar-sign"></i>
-                <span>$45,230</span>
+            <div class="stat-box">
+                <i class="fas fa-users"></i>
+                <span>1,234 Usuarios</span>
             </div>
         </div>
     </div>
