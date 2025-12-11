@@ -72,17 +72,18 @@ body {
 }
 
 /* Simple Header Banner */
+/* Simple Header Banner - VERSIÓN COMPACTA */
 header {
     background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('/images/waterfall.jpg');
     background-position: center center;
     background-size: cover;
     background-repeat: no-repeat;
     color: white;
-    padding: 120px 20px 80px;
+    padding: 40px 20px 30px; /* Reducido de 120px a 40px */
     text-align: center;
     position: relative;
     overflow: hidden;
-    min-height: 100vh;
+    min-height: 200px; /* Reducido de 100vh a 200px */
     display: flex;
     align-items: center;
 }
