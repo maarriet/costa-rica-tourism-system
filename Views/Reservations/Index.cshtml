@@ -28,7 +28,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        /* Essential CSS for Reservations */
+        body {
+            background: #f8f9fa;
+            font-family: 'Poppins', sans-serif;
+        }
+
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -45,7 +49,13 @@
             .section-header h2 {
                 margin: 0;
                 color: #333;
+                font-size: 1.8rem;
             }
+
+        .section-actions {
+            display: flex;
+            gap: 10px;
+        }
 
         .btn {
             padding: 10px 20px;
@@ -54,7 +64,7 @@
             text-decoration: none;
             display: inline-block;
             font-weight: 500;
-            margin-right: 10px;
+            cursor: pointer;
         }
 
         .btn-primary {
@@ -76,6 +86,11 @@
             border: 1px solid #6c757d;
             color: #6c757d;
             background: transparent;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            text-decoration: none;
         }
 
         .stats-overview {
@@ -104,17 +119,24 @@
             justify-content: center;
             background-color: #007bff;
             color: white;
+            font-size: 1.2rem;
+        }
+
+        .stat-content {
+            flex: 1;
         }
 
         .stat-number {
             font-size: 1.5rem;
             font-weight: bold;
             color: #333;
+            margin: 0;
         }
 
         .stat-label {
             color: #666;
             font-size: 0.9rem;
+            margin: 0;
         }
 
         .filters-section {
@@ -135,23 +157,36 @@
         .filter-group {
             display: flex;
             flex-direction: column;
+            min-width: 150px;
         }
 
         .filter-label {
             margin-bottom: 5px;
             font-weight: 500;
             color: #333;
+            font-size: 0.9rem;
         }
 
         .form-control {
             padding: 8px 12px;
             border: 1px solid #ddd;
             border-radius: 4px;
+            font-size: 0.9rem;
         }
 
         .filter-actions {
             display: flex;
             gap: 10px;
+            align-items: end;
+        }
+
+        .filter-summary {
+            background-color: #e3f2fd;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            color: #1976d2;
+            font-size: 0.9rem;
         }
 
         .table-container {
@@ -164,19 +199,21 @@
         .data-table {
             width: 100%;
             border-collapse: collapse;
+            font-size: 0.9rem;
         }
 
             .data-table th {
                 background-color: #f8f9fa;
-                padding: 15px;
+                padding: 12px;
                 text-align: left;
                 font-weight: 600;
                 color: #333;
                 border-bottom: 2px solid #dee2e6;
+                font-size: 0.85rem;
             }
 
             .data-table td {
-                padding: 15px;
+                padding: 12px;
                 border-bottom: 1px solid #eee;
                 vertical-align: middle;
             }
@@ -185,36 +222,31 @@
                 background-color: #f8f9fa;
             }
 
+        .status {
+            padding: 4px 8px;
+            border-radius: 15px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
         .status-available {
             background-color: #28a745;
             color: white;
-            padding: 4px 8px;
-            border-radius: 15px;
-            font-size: 12px;
         }
 
         .status-maintenance {
             background-color: #ffc107;
             color: #212529;
-            padding: 4px 8px;
-            border-radius: 15px;
-            font-size: 12px;
         }
 
         .status-inactive {
             background-color: #6c757d;
             color: white;
-            padding: 4px 8px;
-            border-radius: 15px;
-            font-size: 12px;
         }
 
         .status-busy {
             background-color: #dc3545;
             color: white;
-            padding: 4px 8px;
-            border-radius: 15px;
-            font-size: 12px;
         }
 
         .action-buttons {
@@ -223,7 +255,7 @@
         }
 
         .btn-icon {
-            padding: 8px;
+            padding: 6px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
@@ -231,8 +263,9 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 32px;
-            height: 32px;
+            width: 28px;
+            height: 28px;
+            font-size: 0.8rem;
         }
 
         .btn-edit {
@@ -255,18 +288,25 @@
             color: white;
         }
 
+        .btn-icon:hover {
+            opacity: 0.8;
+            text-decoration: none;
+        }
+
         .customer-info strong {
             display: block;
+            font-size: 0.9rem;
         }
 
         .customer-info small {
             display: block;
             color: #666;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
         }
 
         .place-info strong {
             display: block;
+            font-size: 0.9rem;
         }
 
         .badge {
@@ -281,7 +321,7 @@
         }
 
         .date-info {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
 
         .check-dates {
@@ -292,26 +332,29 @@
 
         .time {
             color: #666;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
         }
 
         .guest-count {
             display: flex;
             align-items: center;
             gap: 5px;
+            font-size: 0.9rem;
         }
 
         .amount-info strong {
             display: block;
+            font-size: 0.9rem;
         }
 
         .amount-info small {
             color: #666;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
         }
 
         .days-until {
             font-weight: 500;
+            font-size: 0.85rem;
         }
 
         .text-warning {
@@ -331,6 +374,7 @@
                 font-size: 3rem;
                 color: #ddd;
                 margin-bottom: 15px;
+                display: block;
             }
 
             .empty-state h3 {
@@ -343,12 +387,13 @@
                 margin-bottom: 20px;
             }
 
-        .filter-summary {
-            background-color: #e3f2fd;
-            padding: 10px 15px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            color: #1976d2;
+        .code {
+            background-color: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: #495057;
         }
 
         .breadcrumb-nav {
@@ -452,7 +497,6 @@
         </div>
     </div>
 
-    <!-- Rest of your existing content stays the same -->
     <!-- Filters -->
     <div class="filters-section">
         <form method="get" asp-action="Index">
@@ -483,8 +527,179 @@
         </form>
     </div>
 
-    <!-- Continue with the rest of your table and content... -->
-    <!-- [Rest of your existing HTML content] -->
+    <!-- Filter Summary -->
+    @if (Model.DateFrom.HasValue || Model.DateTo.HasValue || Model.StatusFilter.HasValue)
+    {
+        <div class="filter-summary">
+            <i class="fas fa-filter"></i>
+            <span>
+                Filtros activos:
+                @if (Model.DateFrom.HasValue)
+                {
+                    <text>Desde @Model.DateFrom.Value.ToString("dd/MM/yyyy")</text>
+                }
+                @if (Model.DateTo.HasValue)
+                {
+                    <text>Hasta @Model.DateTo.Value.ToString("dd/MM/yyyy")</text>
+                }
+                @if (Model.StatusFilter.HasValue)
+                {
+                    <text>Estado: @GetStatusText(Model.StatusFilter.Value)</text>
+                }
+            </span>
+        </div>
+    }
+
+    <!-- Reservations Table -->
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Cliente</th>
+                    <th>Lugar</th>
+                    <th>Fechas</th>
+                    <th>Personas</th>
+                    <th>Estado</th>
+                    <th>Total</th>
+                    <th>Días Restantes</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Reservations != null && Model.Reservations.Any())
+                {
+                    @foreach (var reservation in Model.Reservations)
+                    {
+                        <tr>
+                            <td><span class="code">@reservation.ReservationCode</span></td>
+                            <td>
+                                <div class="customer-info">
+                                    <strong>@reservation.ClientName</strong>
+                                    @if (!string.IsNullOrEmpty(reservation.ClientEmail))
+                                    {
+                                        <small>@reservation.ClientEmail</small>
+                                    }
+                                    @if (!string.IsNullOrEmpty(reservation.ClientPhone))
+                                    {
+                                        <small><i class="fas fa-phone"></i> @reservation.ClientPhone</small>
+                                    }
+                                </div>
+                            </td>
+                            <td>
+                                <div class="place-info">
+                                    <strong>@reservation.PlaceName</strong>
+                                    @if (!string.IsNullOrEmpty(reservation.CategoryName))
+                                    {
+                                        <small class="badge badge-secondary">@reservation.CategoryName</small>
+                                    }
+                                </div>
+                            </td>
+                            <td>
+                                <div class="date-info">
+                                    <div class="check-dates">
+                                        <strong>@reservation.StartDate.ToString("dd/MM/yyyy")</strong>
+                                        @if (reservation.StartTime.HasValue)
+                                        {
+                                            <span class="time">@reservation.StartTime.Value.ToString(@"hh\:mm")</span>
+                                        }
+                                        @if (reservation.EndDate.HasValue)
+                                        {
+                                            <div class="date-separator">→</div>
+                                            <strong>@reservation.EndDate.Value.ToString("dd/MM/yyyy")</strong>
+                                            @if (reservation.EndTime.HasValue)
+                                            {
+                                                <span class="time">@reservation.EndTime.Value.ToString(@"hh\:mm")</span>
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="guest-count">
+                                    <i class="fas fa-users"></i> @reservation.NumberOfPeople
+                                </span>
+                            </td>
+                            <td>
+                                <span class="status @GetStatusClass(reservation.Status)">
+                                    @GetStatusText(reservation.Status)
+                                </span>
+                            </td>
+                            <td>
+                                <div class="amount-info">
+                                    <strong>@reservation.TotalAmount.ToString("C")</strong>
+                                    @if (reservation.PlacePrice > 0)
+                                    {
+                                        <small>(@reservation.PlacePrice.ToString("C")/noche)</small>
+                                    }
+                                </div>
+                            </td>
+                            <td>
+                                @if (reservation.DaysUntilReservation >= 0)
+                                {
+                                    <span class="days-until @(reservation.DaysUntilReservation <= 3 ? "text-warning" : "text-muted")">
+                                        @if (reservation.DaysUntilReservation == 0)
+                                        {
+                                            <strong>Hoy</strong>
+                                        }
+                                        else if (reservation.DaysUntilReservation == 1)
+                                        {
+                                            <strong>Mañana</strong>
+                                        }
+                                        else
+                                        {
+                                            <span>@reservation.DaysUntilReservation días</span>
+                                        }
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Pasada</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a asp-action="Edit" asp-route-id="@reservation.Id" class="btn-icon btn-edit" title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a asp-action="Details" asp-route-id="@reservation.Id" class="btn-icon btn-view" title="Ver detalles">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    @if (reservation.Status == ReservationStatus.Pending)
+                                    {
+                                        <button class="btn-icon btn-success" onclick="confirmReservation(@reservation.Id)" title="Confirmar">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                    }
+                                    @if (reservation.Status != ReservationStatus.Cancelled && reservation.Status != ReservationStatus.Completed)
+                                    {
+                                        <a asp-action="Delete" asp-route-id="@reservation.Id" class="btn-icon btn-delete" title="Cancelar">
+                                            <i class="fas fa-ban"></i>
+                                        </a>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="9" class="text-center">
+                            <div class="empty-state">
+                                <i class="fas fa-calendar-check"></i>
+                                <h3>No hay reservas registradas</h3>
+                                <p>Comienza creando tu primera reserva</p>
+                                <a asp-action="Create" class="btn btn-primary">
+                                    <i class="fas fa-plus"></i> Crear Primera Reserva
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 </div>
 
 @section Scripts {
