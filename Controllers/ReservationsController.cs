@@ -220,13 +220,35 @@ namespace Sistema_GuiaLocal_Turismo.Controllers
                 }
             }
 
-            // AGREGAR ESTAS LÍNEAS - Forzar remover error de ReservationCode
+            // Remover error de ReservationCode
             if (ModelState.ContainsKey("ReservationCode"))
             {
                 ModelState.Remove("ReservationCode");
             }
 
-            // Ahora verificar ModelState
+            // Validar fechas
+            if (viewModel.StartDate < DateTime.Today)
+            {
+                ModelState.AddModelError("StartDate", "La fecha de inicio no puede ser anterior a hoy");
+            }
+
+            if (viewModel.EndDate.HasValue && viewModel.EndDate < viewModel.StartDate)
+            {
+                ModelState.AddModelError("EndDate", "La fecha de fin no puede ser anterior a la fecha de inicio");
+            }
+
+            // Check place availability
+            var placeForValidation = await _context.Places.FindAsync(viewModel.PlaceId);
+            if (placeForValidation == null)
+            {
+                ModelState.AddModelError("PlaceId", "Lugar no encontrado");
+            }
+            else if (placeForValidation.Status != PlaceStatus.Available)
+            {
+                ModelState.AddModelError("PlaceId", "El lugar no está disponible");
+            }
+
+            // Si hay errores, mostrar vista con errores
             if (!ModelState.IsValid)
             {
                 var errors = ModelState
@@ -250,73 +272,39 @@ namespace Sistema_GuiaLocal_Turismo.Controllers
                 return View(viewModel);
             }
 
-            // Si llegamos aquí, debería guardar
-            TempData["SuccessMessage"] = "¡Validación pasó correctamente!";
+            // *** AQUÍ ESTÁ EL CÓDIGO DE GUARDADO QUE FALTABA ***
+            var totalAmount = CalculateTotalAmount(placeForValidation.Price, viewModel.NumberOfPeople, viewModel.StartDate, viewModel.EndDate);
 
-            // MOSTRAR ERRORES DE VALIDACIÓN EN TEMPDATA
-            if (!ModelState.IsValid)
+            var reservation = new Reservation
             {
-                var errors = ModelState
-                    .Where(x => x.Value.Errors.Count > 0)
-                    .Select(x => $"{x.Key}: {string.Join(", ", x.Value.Errors.Select(e => e.ErrorMessage))}")
-                    .ToList();
+                ReservationCode = viewModel.ReservationCode,
+                PlaceId = viewModel.PlaceId,
+                ClientName = viewModel.ClientName,
+                ClientEmail = viewModel.ClientEmail,
+                ClientPhone = viewModel.ClientPhone,
+                StartDate = viewModel.StartDate,
+                EndDate = viewModel.EndDate,
+                StartTime = viewModel.StartTime,
+                EndTime = viewModel.EndTime,
+                NumberOfPeople = viewModel.NumberOfPeople,
+                TotalAmount = totalAmount,
+                Status = ReservationStatus.Pending,
+                Notes = viewModel.Notes,
+                CreatedDate = DateTime.Now,
+                UpdatedDate = DateTime.Now
+            };
 
-                TempData["ValidationErrors"] = string.Join(" | ", errors);
-            }
+            _context.Add(reservation);
+            await _context.SaveChangesAsync();
 
-            // Validar fechas
-            if (viewModel.StartDate < DateTime.Today)
-            {
-                ModelState.AddModelError("StartDate", "La fecha de inicio no puede ser anterior a hoy");
-                TempData["DateError"] = "Fecha de inicio inválida";
-            }
+            // Create reminder alert
+            await CreateReservationAlert(reservation);
 
-            if (viewModel.EndDate.HasValue && viewModel.EndDate < viewModel.StartDate)
-            {
-                ModelState.AddModelError("EndDate", "La fecha de fin no puede ser anterior a la fecha de inicio");
-                TempData["DateError"] = "Fecha de fin inválida";
-            }
-
-            // Check place availability
-            if (viewModel.PlaceId > 0)
-            {
-                var place = await _context.Places.FindAsync(viewModel.PlaceId);
-                if (place == null)
-                {
-                    ModelState.AddModelError("PlaceId", "Lugar no encontrado");
-                    TempData["PlaceError"] = "Lugar no encontrado";
-                }
-                else if (place.Status != PlaceStatus.Available)
-                {
-                    ModelState.AddModelError("PlaceId", "El lugar no está disponible");
-                    TempData["PlaceError"] = "Lugar no disponible";
-                }
-            }
-            else
-            {
-                TempData["PlaceError"] = "Debe seleccionar un lugar";
-            }
-
-            if (ModelState.IsValid)
-            {
-                // tu código de guardado existente...
-                TempData["SuccessMessage"] = "¡Reserva creada exitosamente!";
-                return RedirectToAction(nameof(Index));
-            }
-
-            // Recargar datos
-            ViewBag.Places = await GetPlacesSelectList();
-            ViewBag.PlacesData = await _context.Places
-                .Select(p => new {
-                    id = p.Id,
-                    name = p.Name,
-                    price = p.Price
-                }).ToListAsync();
-
-            return View(viewModel);
+            TempData["SuccessMessage"] = $"Reserva {viewModel.ReservationCode} creada exitosamente";
+            return RedirectToAction(nameof(Index));
         }
 
-   
+
 
         // Resto de métodos sin cambios...
 
