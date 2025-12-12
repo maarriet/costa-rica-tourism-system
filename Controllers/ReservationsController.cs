@@ -192,8 +192,10 @@ namespace Sistema_GuiaLocal_Turismo.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ReservationViewModel viewModel)
         {
+            // DEBUG: Mostrar valores recibidos
+            TempData["DebugInfo"] = $"PlaceId: {viewModel.PlaceId}, ClientName: '{viewModel.ClientName}', ClientEmail: '{viewModel.ClientEmail}', NumberOfPeople: {viewModel.NumberOfPeople}, StartDate: {viewModel.StartDate}";
 
-            // GENERAR CÓDIGO DE RESERVA ANTES DE VALIDAR
+            // Generar código de reserva
             if (string.IsNullOrEmpty(viewModel.ReservationCode))
             {
                 viewModel.ReservationCode = await GenerateReservationCode();
@@ -207,7 +209,7 @@ namespace Sistema_GuiaLocal_Turismo.Controllers
                 viewModel.ClientEmail = user.Email;
             }
 
-            // LLENAR CAMPOS AUTOMÁTICAMENTE ANTES DE VALIDAR
+            // Llenar campos automáticamente
             if (viewModel.PlaceId > 0)
             {
                 var place = await _context.Places
@@ -220,6 +222,35 @@ namespace Sistema_GuiaLocal_Turismo.Controllers
                     viewModel.CategoryName = place.Category?.Name ?? "";
                 }
             }
+
+            // DEBUG: Verificar ModelState
+            TempData["ModelStateValid"] = ModelState.IsValid.ToString();
+
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState
+                    .Where(x => x.Value.Errors.Count > 0)
+                    .Select(x => $"{x.Key}: {string.Join(", ", x.Value.Errors.Select(e => e.ErrorMessage))}")
+                    .ToList();
+
+                TempData["ValidationErrors"] = string.Join(" | ", errors);
+
+                // Recargar datos
+                ViewBag.Places = await GetPlacesSelectList();
+                ViewBag.PlacesData = await _context.Places
+                    .Include(p => p.Category)
+                    .Select(p => new {
+                        id = p.Id,
+                        name = p.Name,
+                        price = p.Price,
+                        categoryName = p.Category.Name
+                    }).ToListAsync();
+
+                return View(viewModel);
+            }
+
+            // Si llegamos aquí, debería guardar
+            TempData["SuccessMessage"] = "¡Validación pasó correctamente!";
 
             // MOSTRAR ERRORES DE VALIDACIÓN EN TEMPDATA
             if (!ModelState.IsValid)

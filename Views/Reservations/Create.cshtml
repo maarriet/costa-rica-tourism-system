@@ -27,6 +27,19 @@
         <strong>Error de lugar:</strong> @TempData["PlaceError"]
     </div>
 }
+@if (TempData["DebugInfo"] != null)
+{
+    <div class="alert alert-info">
+        <strong>Debug Info:</strong> @TempData["DebugInfo"]
+    </div>
+}
+
+@if (TempData["ModelStateValid"] != null)
+{
+    <div class="alert alert-secondary">
+        <strong>ModelState Valid:</strong> @TempData["ModelStateValid"]
+    </div>
+}
 
 <div class="container">
     <div class="section-header">
@@ -229,6 +242,8 @@
                 function updatePlaceInfo() {
             const placeId = document.querySelector('select[name="PlaceId"]').value;
             const placeData = placesData.find(p => p.id == placeId);
+
+
 
             if (placeData) {
                 // Actualizar campos visibles
