@@ -155,6 +155,19 @@ namespace Sistema_GuiaLocal_Turismo.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(PlaceViewModel model)
         {
+            //Lineas para debug
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState
+                    .Where(x => x.Value.Errors.Count > 0)
+                    .Select(x => new { Field = x.Key, Errors = x.Value.Errors.Select(e => e.ErrorMessage) });
+
+                foreach (var error in errors)
+                {
+                    Console.WriteLine($"Campo {error.Field}: {string.Join(", ", error.Errors)}");
+                }
+            }
+
             if (ModelState.IsValid)
             {
                 var place = new Place

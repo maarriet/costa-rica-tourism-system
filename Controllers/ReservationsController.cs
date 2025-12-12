@@ -190,6 +190,19 @@ namespace Sistema_GuiaLocal_Turismo.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ReservationViewModel viewModel)
         {
+            //DEBUG TEMPORAL
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState
+                    .Where(x => x.Value.Errors.Count > 0)
+                    .Select(x => new { Field = x.Key, Errors = x.Value.Errors.Select(e => e.ErrorMessage) });
+
+                foreach (var error in errors)
+                {
+                    Console.WriteLine($"Campo {error.Field}: {string.Join(", ", error.Errors)}");
+                }
+            }
+
             // Si es Usuario, forzar sus datos
             if (User.IsInRole("Usuario"))
             {
@@ -198,20 +211,20 @@ namespace Sistema_GuiaLocal_Turismo.Controllers
                 viewModel.ClientEmail = user.Email;
             }
 
-            if (ModelState.IsValid)
+            
+            if (viewModel.StartDate < DateTime.Today)
             {
-                // Validate dates
-                if (viewModel.StartDate < DateTime.Today)
-                {
-                    ModelState.AddModelError("StartDate", "La fecha de inicio no puede ser anterior a hoy");
-                }
+                ModelState.AddModelError("StartDate", "La fecha de inicio no puede ser anterior a hoy");
+            }
 
-                if (viewModel.EndDate.HasValue && viewModel.EndDate < viewModel.StartDate)
-                {
-                    ModelState.AddModelError("EndDate", "La fecha de fin no puede ser anterior a la fecha de inicio");
-                }
+            if (viewModel.EndDate.HasValue && viewModel.EndDate < viewModel.StartDate)
+            {
+                ModelState.AddModelError("EndDate", "La fecha de fin no puede ser anterior a la fecha de inicio");
+            }
 
-                // Check place availability
+            // Check place availability
+            if (viewModel.PlaceId > 0)
+            {
                 var place = await _context.Places.FindAsync(viewModel.PlaceId);
                 if (place == null)
                 {
@@ -221,51 +234,61 @@ namespace Sistema_GuiaLocal_Turismo.Controllers
                 {
                     ModelState.AddModelError("PlaceId", "El lugar no está disponible");
                 }
-
-                if (ModelState.IsValid)
-                {
-                    // Generate reservation code
-                    var reservationCode = await GenerateReservationCode();
-
-                    // Calculate total amount
-                    var totalAmount = CalculateTotalAmount(place.Price, viewModel.NumberOfPeople, viewModel.StartDate, viewModel.EndDate);
-
-                    var reservation = new Reservation
-                    {
-                        ReservationCode = reservationCode,
-                        PlaceId = viewModel.PlaceId,
-                        ClientName = viewModel.ClientName,
-                        ClientEmail = viewModel.ClientEmail,
-                        ClientPhone = viewModel.ClientPhone,
-                        StartDate = viewModel.StartDate,
-                        EndDate = viewModel.EndDate,
-                        StartTime = viewModel.StartTime,
-                        EndTime = viewModel.EndTime,
-                        NumberOfPeople = viewModel.NumberOfPeople,
-                        TotalAmount = totalAmount,
-                        Status = ReservationStatus.Pending,
-                        Notes = viewModel.Notes,
-                        CreatedDate = DateTime.Now,
-                        UpdatedDate = DateTime.Now
-                    };
-
-                    _context.Add(reservation);
-                    await _context.SaveChangesAsync();
-
-                    // Create reminder alert
-                    await CreateReservationAlert(reservation);
-
-                    TempData["SuccessMessage"] = $"Reserva {reservationCode} creada exitosamente";
-                    return RedirectToAction(nameof(Index));
-                }
             }
 
+            
+            if (ModelState.IsValid)
+            {
+                var place = await _context.Places.FindAsync(viewModel.PlaceId);
+
+                // Generate reservation code
+                var reservationCode = await GenerateReservationCode();
+
+                // Calculate total amount
+                var totalAmount = CalculateTotalAmount(place.Price, viewModel.NumberOfPeople, viewModel.StartDate, viewModel.EndDate);
+
+                var reservation = new Reservation
+                {
+                    ReservationCode = reservationCode,
+                    PlaceId = viewModel.PlaceId,
+                    ClientName = viewModel.ClientName,
+                    ClientEmail = viewModel.ClientEmail,
+                    ClientPhone = viewModel.ClientPhone,
+                    StartDate = viewModel.StartDate,
+                    EndDate = viewModel.EndDate,
+                    StartTime = viewModel.StartTime,
+                    EndTime = viewModel.EndTime,
+                    NumberOfPeople = viewModel.NumberOfPeople,
+                    TotalAmount = totalAmount,
+                    Status = ReservationStatus.Pending,
+                    Notes = viewModel.Notes,
+                    CreatedDate = DateTime.Now,
+                    UpdatedDate = DateTime.Now
+                };
+
+                _context.Add(reservation);
+                await _context.SaveChangesAsync();
+
+                // Create reminder alert
+                await CreateReservationAlert(reservation);
+
+                TempData["SuccessMessage"] = $"Reserva {reservationCode} creada exitosamente";
+                return RedirectToAction(nameof(Index));
+            }
+
+            //Recargar ViewBag.PlacesData también
             ViewBag.Places = await GetPlacesSelectList();
+            ViewBag.PlacesData = await _context.Places
+                .Select(p => new {
+                    id = p.Id,
+                    name = p.Name,
+                    price = p.Price
+                }).ToListAsync();
+
             return View(viewModel);
         }
 
         // Resto de métodos sin cambios...
-        // (Edit, CheckIn, CheckOut, etc. - mantén tu código existente)
 
         // Método corregido para lugares disponibles
         public async Task<IActionResult> AvailablePlaces(int? categoryId, string search)
@@ -295,7 +318,7 @@ namespace Sistema_GuiaLocal_Turismo.Controllers
             return View(places);
         }
 
-        // Métodos privados (mantén los existentes)
+        
         private async Task<string> GenerateReservationCode()
         {
             string code;
@@ -356,7 +379,7 @@ namespace Sistema_GuiaLocal_Turismo.Controllers
             return new SelectList(places, "Id", "DisplayName");
         }
 
-        // Agregar los métodos que faltaban del código original
+   
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Administrador")]
