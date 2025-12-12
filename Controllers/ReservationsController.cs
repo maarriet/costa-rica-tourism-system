@@ -306,7 +306,151 @@ namespace Sistema_GuiaLocal_Turismo.Controllers
 
 
 
-        // Resto de métodos sin cambios...
+        // GET: Reservations/Edit/5
+        [Authorize(Roles = "Administrador")] // Solo admin puede editar
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var reservation = await _context.Reservations
+                .Include(r => r.Place)
+                .ThenInclude(p => p.Category)
+                .FirstOrDefaultAsync(r => r.Id == id);
+
+            if (reservation == null)
+            {
+                return NotFound();
+            }
+
+            var viewModel = new ReservationViewModel
+            {
+                Id = reservation.Id,
+                ReservationCode = reservation.ReservationCode,
+                PlaceId = reservation.PlaceId,
+                PlaceName = reservation.Place.Name,
+                CategoryName = reservation.Place.Category.Name,
+                ClientName = reservation.ClientName,
+                ClientEmail = reservation.ClientEmail,
+                ClientPhone = reservation.ClientPhone,
+                StartDate = reservation.StartDate,
+                EndDate = reservation.EndDate,
+                StartTime = reservation.StartTime,
+                EndTime = reservation.EndTime,
+                NumberOfPeople = reservation.NumberOfPeople,
+                TotalAmount = reservation.TotalAmount,
+                Status = reservation.Status,
+                Notes = reservation.Notes,
+                PlacePrice = reservation.Place.Price
+            };
+
+            ViewBag.Places = await GetPlacesSelectList();
+            ViewBag.PlacesData = await _context.Places
+                .Include(p => p.Category)
+                .Select(p => new {
+                    id = p.Id,
+                    name = p.Name,
+                    price = p.Price,
+                    categoryName = p.Category.Name
+                }).ToListAsync();
+
+            return View(viewModel);
+        }
+
+        // POST: Reservations/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrador")]
+        public async Task<IActionResult> Edit(int id, ReservationViewModel viewModel)
+        {
+            if (id != viewModel.Id)
+            {
+                return NotFound();
+            }
+
+            // Remover error de ReservationCode si existe
+            if (ModelState.ContainsKey("ReservationCode"))
+            {
+                ModelState.Remove("ReservationCode");
+            }
+
+            // Validar fechas
+            if (viewModel.StartDate < DateTime.Today)
+            {
+                ModelState.AddModelError("StartDate", "La fecha de inicio no puede ser anterior a hoy");
+            }
+
+            if (viewModel.EndDate.HasValue && viewModel.EndDate < viewModel.StartDate)
+            {
+                ModelState.AddModelError("EndDate", "La fecha de fin no puede ser anterior a la fecha de inicio");
+            }
+
+            // Validar lugar
+            var place = await _context.Places.FindAsync(viewModel.PlaceId);
+            if (place == null)
+            {
+                ModelState.AddModelError("PlaceId", "Lugar no encontrado");
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var reservation = await _context.Reservations.FindAsync(id);
+                    if (reservation == null)
+                    {
+                        return NotFound();
+                    }
+
+                    // Actualizar campos
+                    reservation.PlaceId = viewModel.PlaceId;
+                    reservation.ClientName = viewModel.ClientName;
+                    reservation.ClientEmail = viewModel.ClientEmail;
+                    reservation.ClientPhone = viewModel.ClientPhone;
+                    reservation.StartDate = viewModel.StartDate;
+                    reservation.EndDate = viewModel.EndDate;
+                    reservation.StartTime = viewModel.StartTime;
+                    reservation.EndTime = viewModel.EndTime;
+                    reservation.NumberOfPeople = viewModel.NumberOfPeople;
+                    reservation.TotalAmount = CalculateTotalAmount(place.Price, viewModel.NumberOfPeople, viewModel.StartDate, viewModel.EndDate);
+                    reservation.Status = viewModel.Status;
+                    reservation.Notes = viewModel.Notes;
+                    reservation.UpdatedDate = DateTime.Now;
+
+                    _context.Update(reservation);
+                    await _context.SaveChangesAsync();
+
+                    TempData["SuccessMessage"] = $"Reserva {reservation.ReservationCode} actualizada exitosamente";
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!ReservationExists(viewModel.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+            }
+
+            // Si hay errores, recargar datos
+            ViewBag.Places = await GetPlacesSelectList();
+            ViewBag.PlacesData = await _context.Places
+                .Include(p => p.Category)
+                .Select(p => new {
+                    id = p.Id,
+                    name = p.Name,
+                    price = p.Price,
+                    categoryName = p.Category.Name
+                }).ToListAsync();
+
+            return View(viewModel);
+        }
 
         // Método corregido para lugares disponibles
         public async Task<IActionResult> AvailablePlaces(int? categoryId, string search)
@@ -398,14 +542,7 @@ namespace Sistema_GuiaLocal_Turismo.Controllers
         }
 
    
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Administrador")]
-        public async Task<IActionResult> Edit(int id, ReservationViewModel viewModel)
-        {
-            // Tu código existente de Edit
-            return View(viewModel);
-        }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
