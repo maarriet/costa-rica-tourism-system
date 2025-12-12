@@ -365,6 +365,9 @@ namespace Sistema_GuiaLocal_Turismo.Controllers
         [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Edit(int id, ReservationViewModel viewModel)
         {
+            // DEBUG: Verificar que llega al método
+            TempData["DebugEdit"] = $"Edit POST ejecutado - ID: {id}, ReservationCode: {viewModel.ReservationCode}";
+
             if (id != viewModel.Id)
             {
                 return NotFound();
