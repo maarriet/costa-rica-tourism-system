@@ -36,6 +36,8 @@
             <input asp-for="Id" type="hidden" />
             <input asp-for="ReservationCode" type="hidden" />
             <input asp-for="CreatedDate" type="hidden" />
+            <input asp-for="PlaceName" type="hidden" />
+            <input asp-for="CategoryName" type="hidden" />
 
             <!-- Reservation Info Header -->
             <div class="reservation-header">
@@ -222,6 +224,42 @@
 @section Scripts {
     <script src="~/js/tourism-system.js"></script>
     <script>
+                // Place data (this would come from the server)
+        const placesData = @Html.Raw(Json.Serialize(ViewBag.PlacesData ?? new object()));
+
+        function updatePlaceInfo() {
+            const placeId = document.querySelector('select[name="PlaceId"]').value;
+            const placeData = placesData.find(p => p.id == placeId);
+
+            if (placeData) {
+                // Actualizar campos visibles
+                document.querySelector('input[name="PlacePrice"]').value = placeData.price;
+
+                // AGREGAR ESTAS LÍNEAS - Actualizar campos ocultos
+                document.querySelector('input[name="PlaceName"]').value = placeData.name;
+                document.querySelector('input[name="CategoryName"]').value = placeData.categoryName || '';
+
+                calculateTotal();
+            } else {
+                document.querySelector('input[name="PlacePrice"]').value = '';
+
+                // Limpiar campos ocultos
+                document.querySelector('input[name="PlaceName"]').value = '';
+                document.querySelector('input[name="CategoryName"]').value = '';
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar campos ocultos con valores actuales
+            const currentPlaceId = document.querySelector('select[name="PlaceId"]').value;
+            if (currentPlaceId) {
+                updatePlaceInfo();
+            }
+
+            calculateDays();
+            calculateTotal();
+        });
         function calculateDays() {
             const startDate = document.querySelector('input[name="StartDate"]').value;
             const endDate = document.querySelector('input[name="EndDate"]').value;
@@ -251,4 +289,6 @@
             calculateTotal();
         });
     </script>
+
+
 }
