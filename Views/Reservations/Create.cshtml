@@ -42,6 +42,10 @@
         <form asp-action="Create" method="post">
             <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
 
+            <input asp-for="PlaceName" type="hidden" />
+            <input asp-for="CategoryName" type="hidden" />
+            <input asp-for="ReservationCode" type="hidden" />
+
             <!-- Customer Information -->
             <div class="form-section">
                 <h3><i class="fas fa-user"></i> Información del Cliente</h3>
@@ -222,17 +226,27 @@
         // Place data (this would come from the server)
         const placesData = @Html.Raw(Json.Serialize(ViewBag.PlacesData ?? new object()));
 
-        function updatePlaceInfo() {
+                function updatePlaceInfo() {
             const placeId = document.querySelector('select[name="PlaceId"]').value;
             const placeData = placesData.find(p => p.id == placeId);
 
             if (placeData) {
+                // Actualizar campos visibles
                 document.getElementById('place-price-input').value = placeData.price;
                 document.getElementById('summary-place').textContent = placeData.name;
+
+                //Actualizar campos ocultos
+                document.querySelector('input[name="PlaceName"]').value = placeData.name;
+                document.querySelector('input[name="CategoryName"]').value = placeData.categoryName || '';
+
                 calculateTotal();
             } else {
                 document.getElementById('place-price-input').value = '';
                 document.getElementById('summary-place').textContent = '-';
+
+                // Limpiar campos ocultos
+                document.querySelector('input[name="PlaceName"]').value = '';
+                document.querySelector('input[name="CategoryName"]').value = '';
             }
         }
 
