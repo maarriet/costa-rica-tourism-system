@@ -165,6 +165,13 @@ namespace Sistema_GuiaLocal_Turismo.Controllers
         {
             ViewBag.Places = await GetPlacesSelectList();
 
+            ViewBag.PlacesData = await _context.Places
+                .Select(p => new {
+                    id = p.Id,
+                    name = p.Name,
+                    price = p.Price
+              }).ToListAsync();
+
             var viewModel = new ReservationViewModel { StartDate = DateTime.Today.AddDays(1) };
 
             // Si es Usuario, prellenar sus datos

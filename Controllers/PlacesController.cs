@@ -1,14 +1,25 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using Sistema_GuiaLocal_Turismo.Data;
 using Sistema_GuiaLocal_Turismo.Models;
 using Sistema_GuiaLocal_Turismo.ViewModels;
 
+
 namespace Sistema_GuiaLocal_Turismo.Controllers
 {
+    
+    
     [Authorize(Roles = "Administrador")]
     public class PlacesController : Controller
     {
+        private readonly TourismContext _context;
+
+        public PlacesController(TourismContext context)
+        {
+            _context = context;
+        }
         public IActionResult Index(string searchTerm, int? categoryFilter, PlaceStatus? selectedStatus, int page = 1)
         {
             // Datos de prueba - TEMPORAL
@@ -130,30 +141,48 @@ namespace Sistema_GuiaLocal_Turismo.Controllers
             return View(place);
         }
 
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
             var viewModel = new PlaceViewModel();
 
-            // Agregar las categorías de prueba
-            ViewBag.Categories = GetTestCategories();
+            // Usar categorías reales de la base de datos
+            ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "Id", "Name");
 
             return View(viewModel);
         }
 
         [HttpPost]
-        public IActionResult Create(PlaceViewModel model)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(PlaceViewModel model)
         {
             if (ModelState.IsValid)
             {
-                // Simular guardado exitoso
+                var place = new Place
+                {
+                    Name = model.Name,
+                    Code = model.Code,
+                    Description = model.Description,
+                    CategoryId = model.CategoryId,
+                    Price = model.Price,
+                    Location = model.Location,
+                    Capacity = model.Capacity,
+                    Status = model.Status,
+                    CreatedDate = DateTime.Now,
+                    UpdatedDate = DateTime.Now
+                };
+
+                _context.Places.Add(place);
+                await _context.SaveChangesAsync();
+
                 TempData["Success"] = $"Lugar '{model.Name}' creado exitosamente!";
                 return RedirectToAction(nameof(Index));
             }
 
-            // Si hay errores, recargar las categorías
-            ViewBag.Categories = GetTestCategories();
+            ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "Id", "Name");
             return View(model);
         }
+
+     
 
         public IActionResult Edit(int id)
         {

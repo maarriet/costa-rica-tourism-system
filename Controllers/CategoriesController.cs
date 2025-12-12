@@ -210,6 +210,53 @@ namespace Sistema_GuiaLocal_Turismo.Controllers
         }
 
         // POST: Categories/Delete/5
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var category = await _context.Categories
+                .Include(c => c.Places)
+                .FirstOrDefaultAsync(c => c.Id == id);
+
+            if (category == null)
+            {
+                return NotFound();
+            }
+
+            // Crear el ViewModel para la vista
+            var viewModel = new CategoryViewModel
+            {
+                Id = category.Id,
+                Name = category.Name,
+                Description = category.Description,
+                Icon = category.Icon,
+                Color = category.Color,
+                IsActive = category.IsActive,
+                PlaceCount = category.Places.Count,
+                ReservationCount = 0, // Calcular si tienes reservas
+                Revenue = 0, // Calcular si tienes ingresos
+
+                // CAMBIAR ESTA LÍNEA:
+                Places = category.Places.Select(p => new PlaceViewModel
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    Code = p.Code,
+                    Price = p.Price,
+                    Location = p.Location,
+                    Status = p.Status,
+                    CategoryId = p.CategoryId,
+                    Description = p.Description,
+                    Capacity = p.Capacity
+                }).ToList()
+            };
+
+            return View(viewModel);
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
