@@ -187,14 +187,11 @@ namespace Sistema_GuiaLocal_Turismo.Controllers
             return View(viewModel);
         }
 
-        // POST: Reservations/Create - Ambos roles pueden crear
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ReservationViewModel viewModel)
         {
-            // DEBUG: Mostrar valores recibidos
-            TempData["DebugInfo"] = $"PlaceId: {viewModel.PlaceId}, ClientName: '{viewModel.ClientName}', ClientEmail: '{viewModel.ClientEmail}', NumberOfPeople: {viewModel.NumberOfPeople}, StartDate: {viewModel.StartDate}";
-
             // Generar código de reserva
             if (string.IsNullOrEmpty(viewModel.ReservationCode))
             {
@@ -223,9 +220,13 @@ namespace Sistema_GuiaLocal_Turismo.Controllers
                 }
             }
 
-            // DEBUG: Verificar ModelState
-            TempData["ModelStateValid"] = ModelState.IsValid.ToString();
+            // AGREGAR ESTAS LÍNEAS - Forzar remover error de ReservationCode
+            if (ModelState.ContainsKey("ReservationCode"))
+            {
+                ModelState.Remove("ReservationCode");
+            }
 
+            // Ahora verificar ModelState
             if (!ModelState.IsValid)
             {
                 var errors = ModelState
