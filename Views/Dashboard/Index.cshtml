@@ -43,6 +43,19 @@
             <li><a href="@Url.Action("Index", "Reservations")"><i class="fas fa-calendar-check"></i> Reservas</a></li>
             <li><a href="@Url.Action("Index", "Reports")"><i class="fas fa-chart-bar"></i> Reportes</a></li>
         </ul>
+
+        <!-- User Menu -->
+        <div class="user-menu">
+            <span class="user-name">
+                <i class="fas fa-user"></i> @User.Identity.Name
+            </span>
+            <form asp-controller="Account" asp-action="Logout" method="post" style="display: inline;">
+                <button type="submit" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                </button>
+            </form>
+        </div>
+
         <div class="mobile-menu" id="mobileMenu">
             <span></span>
             <span></span>
