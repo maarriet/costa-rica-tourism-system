@@ -192,12 +192,33 @@ namespace Sistema_GuiaLocal_Turismo.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ReservationViewModel viewModel)
         {
+
+            // GENERAR CÓDIGO DE RESERVA ANTES DE VALIDAR
+            if (string.IsNullOrEmpty(viewModel.ReservationCode))
+            {
+                viewModel.ReservationCode = await GenerateReservationCode();
+            }
+
             // Si es Usuario, forzar sus datos
             if (User.IsInRole("Usuario"))
             {
                 var user = await _userManager.GetUserAsync(User);
                 viewModel.ClientName = user.FullName;
                 viewModel.ClientEmail = user.Email;
+            }
+
+            // LLENAR CAMPOS AUTOMÁTICAMENTE ANTES DE VALIDAR
+            if (viewModel.PlaceId > 0)
+            {
+                var place = await _context.Places
+                    .Include(p => p.Category)
+                    .FirstOrDefaultAsync(p => p.Id == viewModel.PlaceId);
+
+                if (place != null)
+                {
+                    viewModel.PlaceName = place.Name;
+                    viewModel.CategoryName = place.Category?.Name ?? "";
+                }
             }
 
             // MOSTRAR ERRORES DE VALIDACIÓN EN TEMPDATA
