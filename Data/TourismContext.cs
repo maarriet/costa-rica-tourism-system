@@ -7,7 +7,7 @@ using System.Reflection.Emit;
 
 namespace Sistema_GuiaLocal_Turismo.Data
 {
-    public class TourismContext : DbContext
+    public class TourismContext : IdentityDbContext<ApplicationUser>
     {
         public TourismContext(DbContextOptions<TourismContext> options) : base(options)
         {
@@ -18,6 +18,7 @@ namespace Sistema_GuiaLocal_Turismo.Data
         public DbSet<Reservation> Reservations { get; set; }
         public DbSet<Alert> Alerts { get; set; }
         public DbSet<PlaceImage> PlaceImages { get; set; }
+        public DbSet<ApplicationUser> ApplicationUsers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
