@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Sistema_GuiaLocal_Turismo.Models;
 using System.Collections.Generic;
 using System.Reflection.Emit;
@@ -43,6 +44,8 @@ namespace Sistema_GuiaLocal_Turismo.Data
             modelBuilder.Entity<Reservation>()
                 .Property(r => r.TotalAmount)
                 .HasPrecision(10, 2);
+            // Seed initial data
+            SeedData(modelBuilder);
         }
 
         private void SeedData(ModelBuilder modelBuilder)

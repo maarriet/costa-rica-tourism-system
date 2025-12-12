@@ -1,0 +1,244 @@
+﻿@model Sistema_GuiaLocal_Turismo.ViewModels.ReservationListViewModel
+@{
+    ViewData["Title"] = "Mis Reservas";
+}
+
+@section Styles {
+    <link href="/css/styles.css" rel="stylesheet" />
+}
+
+<!-- Header Compacto -->
+<div class="compact-header">
+    <div class="header-content">
+        <div class="header-main">
+            <h1><i class="fas fa-calendar-check"></i> Mis Reservas</h1>
+            <p>Gestiona tus reservaciones de turismo</p>
+        </div>
+        <div class="header-stats-mini">
+            <div class="stat-mini">
+                <i class="fas fa-list"></i>
+                <span>@Model.TotalItems Reservas</span>
+            </div>
+            <div class="stat-mini">
+                <i class="fas fa-clock"></i>
+                <span>@Model.Reservations.Count(r => r.Status == Sistema_GuiaLocal_Turismo.Models.ReservationStatus.Pending) Pendientes</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Navegación -->
+<nav>
+    <div class="nav-container">
+        <div class="logo">
+            <i class="fas fa-map-marked-alt"></i> Turismo CR
+        </div>
+        <ul class="nav-links">
+            <li><a href="@Url.Action("Index", "Home")"><i class="fas fa-home"></i> Inicio</a></li>
+            <li><a href="@Url.Action("Places", "Home")"><i class="fas fa-map-marker-alt"></i> Lugares</a></li>
+            <li><a href="@Url.Action("Index", "Reservations")" class="active"><i class="fas fa-calendar-check"></i> Mis Reservas</a></li>
+            <li>
+                <form asp-controller="Account" asp-action="Logout" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-outline-light btn-sm">
+                        <i class="fas fa-sign-out-alt"></i> Salir
+                    </button>
+                </form>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<div class="container">
+    <!-- Filtros -->
+    <div class="page-header">
+        <div class="section-header">
+            <h2><i class="fas fa-filter"></i> Filtrar Reservas</h2>
+            <a href="@Url.Action("Create", "Reservations")" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Nueva Reserva
+            </a>
+        </div>
+
+        <form method="get" class="filters-section">
+            <div class="filter-group">
+                <label asp-for="DateFrom">Fecha Desde:</label>
+                <input asp-for="DateFrom" type="date" class="form-control" />
+            </div>
+            <div class="filter-group">
+                <label asp-for="DateTo">Fecha Hasta:</label>
+                <input asp-for="DateTo" type="date" class="form-control" />
+            </div>
+            <div class="filter-group">
+                <label asp-for="StatusFilter">Estado:</label>
+                <select asp-for="StatusFilter" class="form-control">
+                    <option value="">Todos los estados</option>
+                    <option value="1">Pendiente</option>
+                    <option value="2">Confirmada</option>
+                    <option value="3">Check-In</option>
+                    <option value="4">Check-Out</option>
+                    <option value="5">Completada</option>
+                    <option value="6">Cancelada</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <button type="submit" class="btn btn-primary" style="margin-top: 25px;">
+                    <i class="fas fa-search"></i> Filtrar
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Lista de Reservas -->
+    @if (Model.Reservations.Any())
+    {
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Lugar</th>
+                        <th>Fechas</th>
+                        <th>Personas</th>
+                        <th>Total</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var reservation in Model.Reservations)
+                    {
+                        <tr>
+                            <td>
+                                <span class="code">@reservation.ReservationCode</span>
+                            </td>
+                            <td>
+                                <div class="place-info">
+                                    <strong>@reservation.PlaceName</strong>
+                                    <small>@reservation.CategoryName</small>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="date-info">
+                                    <strong>@reservation.StartDate.ToString("dd/MM/yyyy")</strong>
+                                    @if (reservation.EndDate.HasValue)
+                                    {
+                                        <small>hasta @reservation.EndDate.Value.ToString("dd/MM/yyyy")</small>
+                                    }
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <strong>@reservation.NumberOfPeople</strong>
+                            </td>
+                            <td>
+                                <span class="currency">$@reservation.TotalAmount.ToString("F2")</span>
+                            </td>
+                            <td>
+                                @switch (reservation.Status)
+                                {
+                                    case Sistema_GuiaLocal_Turismo.Models.ReservationStatus.Pending:
+                                        <span class="badge badge-warning">Pendiente</span>
+                                        break;
+                                    case Sistema_GuiaLocal_Turismo.Models.ReservationStatus.Confirmed:
+                                        <span class="badge badge-success">Confirmada</span>
+                                        break;
+                                    case Sistema_GuiaLocal_Turismo.Models.ReservationStatus.CheckedIn:
+                                        <span class="badge badge-info">Check-In</span>
+                                        break;
+                                    case Sistema_GuiaLocal_Turismo.Models.ReservationStatus.CheckedOut:
+                                        <span class="badge badge-primary">Check-Out</span>
+                                        break;
+                                    case Sistema_GuiaLocal_Turismo.Models.ReservationStatus.Completed:
+                                        <span class="badge badge-success">Completada</span>
+                                        break;
+                                    case Sistema_GuiaLocal_Turismo.Models.ReservationStatus.Cancelled:
+                                        <span class="badge badge-danger">Cancelada</span>
+                                        break;
+                                }
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="@Url.Action("Details", "Reservations", new { id = reservation.Id })"
+                                       class="btn-icon btn-view" title="Ver Detalles">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    @if (reservation.Status == Sistema_GuiaLocal_Turismo.Models.ReservationStatus.Pending ||
+                                   reservation.Status == Sistema_GuiaLocal_Turismo.Models.ReservationStatus.Confirmed)
+                                    {
+                                        <button onclick="cancelReservation(@reservation.Id)"
+                                                class="btn-icon btn-delete" title="Cancelar">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Paginación -->
+        <div class="pagination-container">
+            <div class="pagination-info">
+                @Model.ItemsDisplayRange
+            </div>
+            <div class="pagination">
+                @if (Model.HasPreviousPage)
+                {
+                    <a href="@Url.Action("Index", new { page = Model.PreviousPage, dateFrom = Model.DateFrom, dateTo = Model.DateTo, statusFilter = Model.StatusFilter })"
+                       class="btn-page">Anterior</a>
+                }
+
+                @foreach (var pageNum in Model.GetPageNumbers())
+                {
+                    <a href="@Url.Action("Index", new { page = pageNum, dateFrom = Model.DateFrom, dateTo = Model.DateTo, statusFilter = Model.StatusFilter })"
+                       class="btn-page @(pageNum == Model.CurrentPage ? "active" : "")">@pageNum</a>
+                }
+
+                @if (Model.HasNextPage)
+                {
+                    <a href="@Url.Action("Index", new { page = Model.NextPage, dateFrom = Model.DateFrom, dateTo = Model.DateTo, statusFilter = Model.StatusFilter })"
+                       class="btn-page">Siguiente</a>
+                }
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-5">
+            <i class="fas fa-calendar-times" style="font-size: 4rem; color: #6c757d; margin-bottom: 1rem;"></i>
+            <h3>No tienes reservas</h3>
+            <p class="text-muted">¡Explora nuestros increíbles lugares y haz tu primera reserva!</p>
+            <a href="@Url.Action("Places", "Home")" class="btn btn-primary">
+                <i class="fas fa-search"></i> Explorar Lugares
+            </a>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        function cancelReservation(id) {
+            if (confirm('¿Estás seguro de que quieres cancelar esta reserva?')) {
+                fetch('@Url.Action("Cancel", "Reservations")/' + id, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        location.reload();
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    alert('Error al cancelar la reserva');
+                });
+            }
+        }
+    </script>
+}

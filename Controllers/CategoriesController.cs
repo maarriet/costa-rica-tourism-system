@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Sistema_GuiaLocal_Turismo.Data;
 using Sistema_GuiaLocal_Turismo.Models;
@@ -8,6 +9,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Sistema_GuiaLocal_Turismo.Controllers
 {
+    [Authorize(Roles = "Administrador")]
     public class CategoriesController : Controller
     {
         private readonly TourismContext _context;

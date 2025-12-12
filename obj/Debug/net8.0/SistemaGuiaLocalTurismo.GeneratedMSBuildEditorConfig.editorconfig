@@ -20,6 +20,18 @@ build_property._RazorSourceGeneratorDebug =
 build_property.EffectiveAnalysisLevelStyle = 8.0
 build_property.EnableCodeStyleSeverity = 
 
+[C:/Users/maarriet/OneDrive - Intel Corporation/Desktop/Marco/Progra V/Sistema_GuiaLocal&Turismo/SistemaGuiaLocalTurismo/Views/Account/AccessDenied.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxBY2Nlc3NEZW5pZWQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/maarriet/OneDrive - Intel Corporation/Desktop/Marco/Progra V/Sistema_GuiaLocal&Turismo/SistemaGuiaLocalTurismo/Views/Account/Login.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxMb2dpbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/maarriet/OneDrive - Intel Corporation/Desktop/Marco/Progra V/Sistema_GuiaLocal&Turismo/SistemaGuiaLocalTurismo/Views/Account/Register.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxSZWdpc3Rlci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/maarriet/OneDrive - Intel Corporation/Desktop/Marco/Progra V/Sistema_GuiaLocal&Turismo/SistemaGuiaLocalTurismo/Views/Categories/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2F0ZWdvcmllc1xDcmVhdGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
@@ -52,8 +64,24 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/maarriet/OneDrive - Intel Corporation/Desktop/Marco/Progra V/Sistema_GuiaLocal&Turismo/SistemaGuiaLocalTurismo/Views/Home/MyReservations.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxNeVJlc2VydmF0aW9ucy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/maarriet/OneDrive - Intel Corporation/Desktop/Marco/Progra V/Sistema_GuiaLocal&Turismo/SistemaGuiaLocalTurismo/Views/Home/PlaceDetails.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQbGFjZURldGFpbHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/maarriet/OneDrive - Intel Corporation/Desktop/Marco/Progra V/Sistema_GuiaLocal&Turismo/SistemaGuiaLocalTurismo/Views/Home/Places.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQbGFjZXMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/maarriet/OneDrive - Intel Corporation/Desktop/Marco/Progra V/Sistema_GuiaLocal&Turismo/SistemaGuiaLocalTurismo/Views/Home/Privacy.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQcml2YWN5LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/maarriet/OneDrive - Intel Corporation/Desktop/Marco/Progra V/Sistema_GuiaLocal&Turismo/SistemaGuiaLocalTurismo/Views/Home/ReservationDetails.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxSZXNlcnZhdGlvbkRldGFpbHMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/maarriet/OneDrive - Intel Corporation/Desktop/Marco/Progra V/Sistema_GuiaLocal&Turismo/SistemaGuiaLocalTurismo/Views/Places/Create.cshtml]
@@ -98,6 +126,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/maarriet/OneDrive - Intel Corporation/Desktop/Marco/Progra V/Sistema_GuiaLocal&Turismo/SistemaGuiaLocalTurismo/Views/Reservations/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVzZXJ2YXRpb25zXEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/maarriet/OneDrive - Intel Corporation/Desktop/Marco/Progra V/Sistema_GuiaLocal&Turismo/SistemaGuiaLocalTurismo/Views/Reservations/UserReservations.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVzZXJ2YXRpb25zXFVzZXJSZXNlcnZhdGlvbnMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/maarriet/OneDrive - Intel Corporation/Desktop/Marco/Progra V/Sistema_GuiaLocal&Turismo/SistemaGuiaLocalTurismo/Views/Shared/Error.cshtml]

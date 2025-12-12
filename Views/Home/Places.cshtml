@@ -1,0 +1,312 @@
+﻿@model List<Sistema_GuiaLocal_Turismo.Models.Place>
+@{
+    ViewData["Title"] = "Explorar Lugares";
+}
+
+@section Styles {
+    <link href="/css/styles.css" rel="stylesheet" />
+}
+
+<!-- Header Compacto -->
+<div class="compact-header">
+    <div class="header-content">
+        <div class="header-main">
+            <h1><i class="fas fa-map-marker-alt"></i> Explorar Lugares</h1>
+            <p>Descubre los mejores destinos de Costa Rica</p>
+        </div>
+        <div class="header-stats-mini">
+            <div class="stat-mini">
+                <i class="fas fa-map-marker-alt"></i>
+                <span>@Model.Count Lugares</span>
+            </div>
+            <div class="stat-mini">
+                <i class="fas fa-tags"></i>
+                <span>@ViewBag.Categories?.Count Categorías</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Navegación -->
+<nav>
+    <div class="nav-container">
+        <div class="logo">
+            <i class="fas fa-map-marked-alt"></i> Turismo CR
+        </div>
+        <ul class="nav-links">
+            <li><a href="@Url.Action("Index", "Home")"><i class="fas fa-home"></i> Inicio</a></li>
+            <li><a href="@Url.Action("Places", "Home")" class="active"><i class="fas fa-map-marker-alt"></i> Lugares</a></li>
+            <li><a href="@Url.Action("Index", "Reservations")"><i class="fas fa-calendar-check"></i> Mis Reservas</a></li>
+            <li>
+                <form asp-controller="Account" asp-action="Logout" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-outline-light btn-sm">
+                        <i class="fas fa-sign-out-alt"></i> Salir
+                    </button>
+                </form>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<div class="container">
+    <!-- Filtros de Búsqueda -->
+    <div class="page-header">
+        <div class="section-header">
+            <h2><i class="fas fa-search"></i> Buscar Lugares</h2>
+        </div>
+
+        <form method="get" class="filters-section">
+            <div class="filter-group">
+                <label for="search">Buscar por nombre:</label>
+                <input type="text" name="search" value="@ViewBag.Search" class="form-control" placeholder="Nombre del lugar..." />
+            </div>
+            <div class="filter-group">
+                <label for="categoryId">Categoría:</label>
+                <select name="categoryId" class="form-control">
+                    <option value="">Todas las categorías</option>
+                    @if (ViewBag.Categories != null)
+                    {
+                        @foreach (var category in ViewBag.Categories)
+                        {
+                            <option value="@category.Id" selected="@(ViewBag.SelectedCategory == category.Id)">
+                                @category.Name
+                            </option>
+                        }
+                    }
+                </select>
+            </div>
+            <div class="filter-group">
+                <button type="submit" class="btn btn-primary" style="margin-top: 25px;">
+                    <i class="fas fa-search"></i> Buscar
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Filtros Rápidos por Categoría -->
+    @if (ViewBag.Categories != null)
+    {
+        <div class="quick-filters mb-4">
+            <h5>Filtros Rápidos:</h5>
+            <div class="d-flex flex-wrap gap-2">
+                <a href="@Url.Action("Places", "Home")"
+                   class="btn @(ViewBag.SelectedCategory == null ? "btn-primary" : "btn-outline-primary") btn-sm">
+                    <i class="fas fa-globe"></i> Todos
+                </a>
+                @foreach (var category in ViewBag.Categories)
+                {
+                    <a href="@Url.Action("Places", "Home", new { categoryId = category.Id })"
+                       class="btn @(ViewBag.SelectedCategory == category.Id ? "btn-primary" : "btn-outline-primary") btn-sm">
+                        <i class="@category.Icon"></i> @category.Name
+                    </a>
+                }
+            </div>
+        </div>
+    }
+
+    <!-- Lista de Lugares -->
+    @if (Model.Any())
+    {
+        <div class="places-grid">
+            @foreach (var place in Model)
+            {
+                <div class="place-card">
+                    <div class="place-header">
+                        <div class="place-icon" style="background-color: @place.Category.Color">
+                            <i class="@place.Category.Icon"></i>
+                        </div>
+                        <div class="place-info">
+                            <h3>@place.Name</h3>
+                            <p><i class="fas fa-map-marker-alt"></i> @place.Location</p>
+                            <p class="category-badge">
+                                <span class="badge" style="background-color: @place.Category.Color">
+                                    @place.Category.Name
+                                </span>
+                            </p>
+                        </div>
+                        <div class="place-price">
+                            <span class="price">$@place.Price.ToString("F2")</span>
+                            <small>por persona</small>
+                        </div>
+                    </div>
+
+                    <div class="place-body">
+                        <p class="description">@place.Description</p>
+
+                        <div class="place-details">
+                            <div class="detail-item">
+                                <i class="fas fa-users"></i>
+                                <span>Capacidad: @place.Capacity personas</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-check-circle text-success"></i>
+                                <span>Disponible</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="place-actions">
+                        <a href="@Url.Action("PlaceDetails", "Home", new { id = place.Id })"
+                           class="btn btn-outline-primary">
+                            <i class="fas fa-info-circle"></i> Ver Detalles
+                        </a>
+                        <a href="@Url.Action("Create", "Reservations", new { placeId = place.Id })"
+                           class="btn btn-primary">
+                            <i class="fas fa-calendar-plus"></i> Reservar
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-5">
+            <i class="fas fa-search" style="font-size: 4rem; color: #6c757d; margin-bottom: 1rem;"></i>
+            <h3>No se encontraron lugares</h3>
+            <p class="text-muted">
+                @if (!string.IsNullOrEmpty(ViewBag.Search as string) || ViewBag.SelectedCategory != null)
+                {
+                    <span>Intenta con otros criterios de búsqueda.</span>
+                }
+                else
+                {
+                    <span>No hay lugares disponibles en este momento.</span>
+                }
+            </p>
+            <a href="@Url.Action("Places", "Home")" class="btn btn-primary">
+                <i class="fas fa-refresh"></i> Ver Todos los Lugares
+            </a>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <style>
+        .places-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .place-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 1px solid #e9ecef;
+        }
+
+            .place-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            }
+
+        .place-header {
+            padding: 1.5rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            border-bottom: 1px solid #f1f1f1;
+        }
+
+        .place-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .place-info {
+            flex: 1;
+        }
+
+            .place-info h3 {
+                margin: 0 0 0.5rem 0;
+                color: #2c3e50;
+                font-size: 1.2rem;
+            }
+
+            .place-info p {
+                margin: 0.25rem 0;
+                color: #6c757d;
+                font-size: 0.9rem;
+            }
+
+        .place-price {
+            text-align: right;
+        }
+
+        .price {
+            display: block;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #28a745;
+        }
+
+        .place-body {
+            padding: 1.5rem;
+        }
+
+        .description {
+            color: #495057;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .place-details {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .place-actions {
+            padding: 1rem 1.5rem;
+            background: #f8f9fa;
+            display: flex;
+            gap: 1rem;
+            justify-content: space-between;
+        }
+
+            .place-actions .btn {
+                flex: 1;
+            }
+
+        .quick-filters {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 10px;
+        }
+
+        .category-badge .badge {
+            color: white !important;
+        }
+
+        /* Media queries corregidas */
+        @@media (max-width: 768px) {
+            .places-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .place-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+}
+}

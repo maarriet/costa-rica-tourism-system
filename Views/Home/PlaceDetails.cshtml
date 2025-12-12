@@ -1,0 +1,392 @@
+﻿@model Sistema_GuiaLocal_Turismo.Models.Place
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+@section Styles {
+    <link href="/css/styles.css" rel="stylesheet" />
+}
+
+<!-- Header Compacto -->
+<div class="compact-header">
+    <div class="header-content">
+        <div class="header-main">
+            <h1><i class="@Model.Category.Icon"></i> @Model.Name</h1>
+            <p>@Model.Location</p>
+        </div>
+        <div class="header-stats-mini">
+            <div class="stat-mini">
+                <i class="fas fa-dollar-sign"></i>
+                <span>$@Model.Price.ToString("F2")</span>
+            </div>
+            <div class="stat-mini">
+                <i class="fas fa-users"></i>
+                <span>@Model.Capacity personas</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Navegación -->
+<nav>
+    <div class="nav-container">
+        <div class="logo">
+            <i class="fas fa-map-marked-alt"></i> Turismo CR
+        </div>
+        <ul class="nav-links">
+            <li><a href="@Url.Action("Index", "Home")"><i class="fas fa-home"></i> Inicio</a></li>
+            <li><a href="@Url.Action("Places", "Home")"><i class="fas fa-map-marker-alt"></i> Lugares</a></li>
+            <li><a href="@Url.Action("Index", "Reservations")"><i class="fas fa-calendar-check"></i> Mis Reservas</a></li>
+            <li>
+                <form asp-controller="Account" asp-action="Logout" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-outline-light btn-sm">
+                        <i class="fas fa-sign-out-alt"></i> Salir
+                    </button>
+                </form>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<div class="container">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Inicio</a></li>
+            <li class="breadcrumb-item"><a href="@Url.Action("Places", "Home")">Lugares</a></li>
+            <li class="breadcrumb-item active">@Model.Name</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <!-- Información Principal -->
+        <div class="col-lg-8">
+            <div class="place-detail-card">
+                <div class="place-detail-header">
+                    <div class="category-info">
+                        <span class="category-badge" style="background-color: @Model.Category.Color">
+                            <i class="@Model.Category.Icon"></i> @Model.Category.Name
+                        </span>
+                    </div>
+                    <h2>@Model.Name</h2>
+                    <p class="location"><i class="fas fa-map-marker-alt"></i> @Model.Location</p>
+                </div>
+
+                <div class="place-detail-body">
+                    <h4><i class="fas fa-info-circle"></i> Descripción</h4>
+                    <p class="description">@Model.Description</p>
+
+                    <div class="features-grid">
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="feature-info">
+                                <h5>Capacidad</h5>
+                                <p>Hasta @Model.Capacity personas</p>
+                            </div>
+                        </div>
+
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-dollar-sign"></i>
+                            </div>
+                            <div class="feature-info">
+                                <h5>Precio</h5>
+                                <p>$@Model.Price.ToString("F2") por persona</p>
+                            </div>
+                        </div>
+
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-check-circle text-success"></i>
+                            </div>
+                            <div class="feature-info">
+                                <h5>Estado</h5>
+                                <p>Disponible para reservar</p>
+                            </div>
+                        </div>
+
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-tag"></i>
+                            </div>
+                            <div class="feature-info">
+                                <h5>Código</h5>
+                                <p>@Model.Code</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel de Reserva -->
+        <div class="col-lg-4">
+            <div class="reservation-panel">
+                <div class="panel-header">
+                    <h4><i class="fas fa-calendar-plus"></i> Hacer Reserva</h4>
+                    <div class="price-display">
+                        <span class="price">$@Model.Price.ToString("F2")</span>
+                        <small>por persona</small>
+                    </div>
+                </div>
+
+                <form asp-controller="Home" asp-action="MakeReservation" method="post" class="reservation-form">
+                    <input type="hidden" name="placeId" value="@Model.Id" />
+
+                    <div class="form-group">
+                        <label for="startDate">Fecha de Inicio:</label>
+                        <input type="date" name="startDate" class="form-control"
+                               min="@DateTime.Today.ToString("yyyy-MM-dd")" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="endDate">Fecha de Fin:</label>
+                        <input type="date" name="endDate" class="form-control"
+                               min="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")" />
+                        <small class="form-text text-muted">Opcional para experiencias de un día</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="numberOfPeople">Número de Personas:</label>
+                        <select name="numberOfPeople" class="form-control" required>
+                            @for (int i = 1; i <= Math.Min((int)Model.Capacity, 10); i++)
+                            {
+                                <option value="@i">@i @(i == 1 ? "persona" : "personas")</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="total-calculation">
+                        <div class="calculation-row">
+                            <span>Precio base:</span>
+                            <span id="basePrice">$@Model.Price.ToString("F2")</span>
+                        </div>
+                        <div class="calculation-row">
+                            <span>Personas:</span>
+                            <span id="peopleCount">1</span>
+                        </div>
+                        <div class="calculation-row">
+                            <span>Días:</span>
+                            <span id="daysCount">1</span>
+                        </div>
+                        <hr>
+                        <div class="calculation-row total">
+                            <strong>Total:</strong>
+                            <strong id="totalAmount">$@Model.Price.ToString("F2")</strong>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg w-100">
+                        <i class="fas fa-calendar-check"></i> Reservar Ahora
+                    </button>
+                </form>
+
+                <div class="contact-info">
+                    <h5><i class="fas fa-info-circle"></i> Información</h5>
+                    <ul>
+                        <li><i class="fas fa-clock"></i> Confirmación inmediata</li>
+                        <li><i class="fas fa-times-circle"></i> Cancelación gratuita</li>
+                        <li><i class="fas fa-shield-alt"></i> Reserva segura</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botón de Regreso -->
+    <div class="text-center mt-4">
+        <a href="@Url.Action("Places", "Home")" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Volver a Lugares
+        </a>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const startDateInput = document.querySelector('input[name="startDate"]');
+            const endDateInput = document.querySelector('input[name="endDate"]');
+            const peopleSelect = document.querySelector('select[name="numberOfPeople"]');
+            const basePrice = @Model.Price;
+
+            function calculateTotal() {
+                const people = parseInt(peopleSelect.value) || 1;
+                const startDate = new Date(startDateInput.value);
+                const endDate = endDateInput.value ? new Date(endDateInput.value) : null;
+
+                let days = 1;
+                if (endDate && endDate > startDate) {
+                    days = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+                }
+
+                const total = basePrice * people * days;
+
+                document.getElementById('peopleCount').textContent = people;
+                document.getElementById('daysCount').textContent = days;
+                document.getElementById('totalAmount').textContent = '$' + total.toFixed(2);
+            }
+
+            startDateInput.addEventListener('change', calculateTotal);
+            endDateInput.addEventListener('change', calculateTotal);
+            peopleSelect.addEventListener('change', calculateTotal);
+
+            // Update end date minimum when start date changes
+            startDateInput.addEventListener('change', function() {
+                const startDate = new Date(this.value);
+                const nextDay = new Date(startDate);
+                nextDay.setDate(nextDay.getDate() + 1);
+                endDateInput.min = nextDay.toISOString().split('T')[0];
+            });
+        });
+    </script>
+
+    <style>
+        .place-detail-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .place-detail-header {
+            padding: 2rem;
+            border-bottom: 1px solid #f1f1f1;
+        }
+
+        .category-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            color: white;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .location {
+            color: #6c757d;
+            font-size: 1.1rem;
+            margin: 0.5rem 0;
+        }
+
+        .place-detail-body {
+            padding: 2rem;
+        }
+
+        .description {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            color: #495057;
+            margin-bottom: 2rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .feature-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .feature-info h5 {
+            margin: 0 0 0.25rem 0;
+            color: #2c3e50;
+        }
+
+        .feature-info p {
+            margin: 0;
+            color: #6c757d;
+        }
+
+        .reservation-panel {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+            position: sticky;
+            top: 2rem;
+        }
+
+        .panel-header {
+            padding: 1.5rem;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .price-display .price {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .reservation-form {
+            padding: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .total-calculation {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        .calculation-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+            .calculation-row.total {
+                font-size: 1.1rem;
+                margin-bottom: 0;
+            }
+
+        .contact-info {
+            padding: 1.5rem;
+            background: #f8f9fa;
+        }
+
+            .contact-info ul {
+                list-style: none;
+                padding: 0;
+                margin: 0.5rem 0 0 0;
+            }
+
+            .contact-info li {
+                padding: 0.25rem 0;
+                color: #6c757d;
+            }
+
+            .contact-info i {
+                width: 20px;
+                color: var(--primary-color);
+            }
+    </style>
+}

@@ -147,10 +147,14 @@ C:\Users\maarriet\OneDrive - Intel Corporation\Desktop\Marco\Progra V\Sistema_Gu
 C:\Users\maarriet\OneDrive - Intel Corporation\Desktop\Marco\Progra V\Sistema_GuiaLocal&Turismo\SistemaGuiaLocalTurismo\obj\Debug\net8.0\staticwebassets\msbuild.buildMultiTargeting.SistemaGuiaLocalTurismo.props
 C:\Users\maarriet\OneDrive - Intel Corporation\Desktop\Marco\Progra V\Sistema_GuiaLocal&Turismo\SistemaGuiaLocalTurismo\obj\Debug\net8.0\staticwebassets\msbuild.buildTransitive.SistemaGuiaLocalTurismo.props
 C:\Users\maarriet\OneDrive - Intel Corporation\Desktop\Marco\Progra V\Sistema_GuiaLocal&Turismo\SistemaGuiaLocalTurismo\obj\Debug\net8.0\staticwebassets.pack.json
-C:\Users\maarriet\OneDrive - Intel Corporation\Desktop\Marco\Progra V\Sistema_GuiaLocal&Turismo\SistemaGuiaLocalTurismo\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
 C:\Users\maarriet\OneDrive - Intel Corporation\Desktop\Marco\Progra V\Sistema_GuiaLocal&Turismo\SistemaGuiaLocalTurismo\obj\Debug\net8.0\SistemaG.0F73F72B.Up2Date
 C:\Users\maarriet\OneDrive - Intel Corporation\Desktop\Marco\Progra V\Sistema_GuiaLocal&Turismo\SistemaGuiaLocalTurismo\obj\Debug\net8.0\SistemaGuiaLocalTurismo.dll
 C:\Users\maarriet\OneDrive - Intel Corporation\Desktop\Marco\Progra V\Sistema_GuiaLocal&Turismo\SistemaGuiaLocalTurismo\obj\Debug\net8.0\refint\SistemaGuiaLocalTurismo.dll
 C:\Users\maarriet\OneDrive - Intel Corporation\Desktop\Marco\Progra V\Sistema_GuiaLocal&Turismo\SistemaGuiaLocalTurismo\obj\Debug\net8.0\SistemaGuiaLocalTurismo.pdb
 C:\Users\maarriet\OneDrive - Intel Corporation\Desktop\Marco\Progra V\Sistema_GuiaLocal&Turismo\SistemaGuiaLocalTurismo\obj\Debug\net8.0\SistemaGuiaLocalTurismo.genruntimeconfig.cache
 C:\Users\maarriet\OneDrive - Intel Corporation\Desktop\Marco\Progra V\Sistema_GuiaLocal&Turismo\SistemaGuiaLocalTurismo\obj\Debug\net8.0\ref\SistemaGuiaLocalTurismo.dll
+C:\Users\maarriet\OneDrive - Intel Corporation\Desktop\Marco\Progra V\Sistema_GuiaLocal&Turismo\SistemaGuiaLocalTurismo\bin\Debug\net8.0\Microsoft.AspNetCore.Cryptography.Internal.dll
+C:\Users\maarriet\OneDrive - Intel Corporation\Desktop\Marco\Progra V\Sistema_GuiaLocal&Turismo\SistemaGuiaLocalTurismo\bin\Debug\net8.0\Microsoft.AspNetCore.Cryptography.KeyDerivation.dll
+C:\Users\maarriet\OneDrive - Intel Corporation\Desktop\Marco\Progra V\Sistema_GuiaLocal&Turismo\SistemaGuiaLocalTurismo\bin\Debug\net8.0\Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll
+C:\Users\maarriet\OneDrive - Intel Corporation\Desktop\Marco\Progra V\Sistema_GuiaLocal&Turismo\SistemaGuiaLocalTurismo\bin\Debug\net8.0\Microsoft.Extensions.Identity.Core.dll
+C:\Users\maarriet\OneDrive - Intel Corporation\Desktop\Marco\Progra V\Sistema_GuiaLocal&Turismo\SistemaGuiaLocalTurismo\bin\Debug\net8.0\Microsoft.Extensions.Identity.Stores.dll

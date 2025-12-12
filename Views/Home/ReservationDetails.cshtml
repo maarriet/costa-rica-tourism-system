@@ -1,0 +1,450 @@
+﻿@model Sistema_GuiaLocal_Turismo.Models.Reservation
+@{
+    ViewData["Title"] = $"Reserva {Model.ReservationCode}";
+}
+
+@section Styles {
+    <link href="/css/styles.css" rel="stylesheet" />
+}
+
+<!-- Header Compacto -->
+<div class="compact-header">
+    <div class="header-content">
+        <div class="header-main">
+            <h1><i class="fas fa-receipt"></i> Reserva @Model.ReservationCode</h1>
+            <p>Detalles completos de tu reservación</p>
+        </div>
+        <div class="header-stats-mini">
+            <div class="stat-mini">
+                <i class="fas fa-dollar-sign"></i>
+                <span>$@Model.TotalAmount.ToString("F2")</span>
+            </div>
+            <div class="stat-mini">
+                <i class="fas fa-users"></i>
+                <span>@Model.NumberOfPeople personas</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Navegación -->
+<nav>
+    <div class="nav-container">
+        <div class="logo">
+            <i class="fas fa-map-marked-alt"></i> Turismo CR
+        </div>
+        <ul class="nav-links">
+            <li><a href="@Url.Action("Index", "Home")"><i class="fas fa-home"></i> Inicio</a></li>
+            <li><a href="@Url.Action("Places", "Home")"><i class="fas fa-map-marker-alt"></i> Lugares</a></li>
+            <li><a href="@Url.Action("MyReservations", "Home")"><i class="fas fa-calendar-check"></i> Mis Reservas</a></li>
+            <li>
+                <form asp-controller="Account" asp-action="Logout" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-outline-light btn-sm">
+                        <i class="fas fa-sign-out-alt"></i> Salir
+                    </button>
+                </form>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<div class="container">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Inicio</a></li>
+            <li class="breadcrumb-item"><a href="@Url.Action("MyReservations", "Home")">Mis Reservas</a></li>
+            <li class="breadcrumb-item active">@Model.ReservationCode</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <!-- Información Principal -->
+        <div class="col-lg-8">
+            <div class="reservation-detail-card">
+                <!-- Estado de la Reserva -->
+                <div class="status-section">
+                    @switch (Model.Status)
+                    {
+                        case Sistema_GuiaLocal_Turismo.Models.ReservationStatus.Pending:
+                            <div class="status-banner status-pending">
+                                <i class="fas fa-clock"></i>
+                                <div>
+                                    <h4>Reserva Pendiente</h4>
+                                    <p>Tu reserva está pendiente de confirmación</p>
+                                </div>
+                            </div>
+                            break;
+                        case Sistema_GuiaLocal_Turismo.Models.ReservationStatus.Confirmed:
+                            <div class="status-banner status-confirmed">
+                                <i class="fas fa-check-circle"></i>
+                                <div>
+                                    <h4>Reserva Confirmada</h4>
+                                    <p>¡Tu reserva ha sido confirmada exitosamente!</p>
+                                </div>
+                            </div>
+                            break;
+                        case Sistema_GuiaLocal_Turismo.Models.ReservationStatus.Cancelled:
+                            <div class="status-banner status-cancelled">
+                                <i class="fas fa-times-circle"></i>
+                                <div>
+                                    <h4>Reserva Cancelada</h4>
+                                    <p>Esta reserva ha sido cancelada</p>
+                                </div>
+                            </div>
+                            break;
+                    }
+                </div>
+
+                <!-- Información del Lugar -->
+                <div class="place-section">
+                    <h3><i class="fas fa-map-marker-alt"></i> Información del Lugar</h3>
+                    <div class="place-card">
+                        <div class="place-icon" style="background-color: @Model.Place.Category.Color">
+                            <i class="@Model.Place.Category.Icon"></i>
+                        </div>
+                        <div class="place-info">
+                            <h4>@Model.Place.Name</h4>
+                            <p class="category">@Model.Place.Category.Name</p>
+                            <p class="location"><i class="fas fa-map-marker-alt"></i> @Model.Place.Location</p>
+                            <p class="description">@Model.Place.Description</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detalles de la Reserva -->
+                <div class="details-section">
+                    <h3><i class="fas fa-info-circle"></i> Detalles de la Reserva</h3>
+                    <div class="details-grid">
+                        <div class="detail-card">
+                            <i class="fas fa-calendar"></i>
+                            <h5>Fecha de Inicio</h5>
+                            <p>@Model.StartDate.ToString("dddd, dd MMMM yyyy", new System.Globalization.CultureInfo("es-ES"))</p>
+                            @if (Model.StartTime.HasValue)
+                            {
+                                <small>Hora: @Model.StartTime.Value.ToString(@"hh\:mm")</small>
+                            }
+                        </div>
+
+                        @if (Model.EndDate.HasValue)
+                        {
+                            <div class="detail-card">
+                                <i class="fas fa-calendar-check"></i>
+                                <h5>Fecha de Fin</h5>
+                                <p>@Model.EndDate.Value.ToString("dddd, dd MMMM yyyy", new System.Globalization.CultureInfo("es-ES"))</p>
+                                @if (Model.EndTime.HasValue)
+                                {
+                                    <small>Hora: @Model.EndTime.Value.ToString(@"hh\:mm")</small>
+                                }
+                            </div>
+                        }
+
+                        <div class="detail-card">
+                            <i class="fas fa-users"></i>
+                            <h5>Número de Personas</h5>
+                            <p>@Model.NumberOfPeople @(Model.NumberOfPeople == 1 ? "persona" : "personas")</p>
+                        </div>
+
+                        <div class="detail-card">
+                            <i class="fas fa-dollar-sign"></i>
+                            <h5>Total</h5>
+                            <p class="price">$@Model.TotalAmount.ToString("F2")</p>
+                        </div>
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrEmpty(Model.Notes))
+                {
+                    <div class="notes-section">
+                        <h3><i class="fas fa-sticky-note"></i> Notas Adicionales</h3>
+                        <div class="notes-content">
+                            <p>@Model.Notes</p>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Panel Lateral -->
+        <div class="col-lg-4">
+            <!-- Resumen -->
+            <div class="summary-card">
+                <h4><i class="fas fa-receipt"></i> Resumen</h4>
+                <div class="summary-item">
+                    <span>Código de Reserva:</span>
+                    <strong>@Model.ReservationCode</strong>
+                </div>
+                <div class="summary-item">
+                    <span>Fecha de Reserva:</span>
+                    <strong>@Model.CreatedDate.ToString("dd/MM/yyyy")</strong>
+                </div>
+                <div class="summary-item">
+                    <span>Estado:</span>
+                    <strong class="status-@Model.Status.ToString().ToLower()">@Model.Status</strong>
+                </div>
+                <hr>
+                <div class="summary-item total">
+                    <span>Total Pagado:</span>
+                    <strong>$@Model.TotalAmount.ToString("F2")</strong>
+                </div>
+            </div>
+
+            <!-- Check-In/Out Info -->
+            @if (Model.CheckInDate.HasValue || Model.CheckOutDate.HasValue)
+            {
+                <div class="checkin-card">
+                    <h4><i class="fas fa-sign-in-alt"></i> Check-In/Out</h4>
+                    @if (Model.CheckInDate.HasValue)
+                    {
+                        <div class="checkin-item">
+                            <i class="fas fa-sign-in-alt text-success"></i>
+                            <div>
+                                <strong>Check-In Realizado</strong>
+                                <p>@Model.CheckInDate.Value.ToString("dd/MM/yyyy HH:mm")</p>
+                            </div>
+                        </div>
+                    }
+                    @if (Model.CheckOutDate.HasValue)
+                    {
+                        <div class="checkin-item">
+                            <i class="fas fa-sign-out-alt text-info"></i>
+                            <div>
+                                <strong>Check-Out Realizado</strong>
+                                <p>@Model.CheckOutDate.Value.ToString("dd/MM/yyyy HH:mm")</p>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+
+            <!-- Acciones -->
+            <div class="actions-card">
+                <h4><i class="fas fa-cogs"></i> Acciones</h4>
+
+                @if (Model.Status == Sistema_GuiaLocal_Turismo.Models.ReservationStatus.Pending ||
+                Model.Status == Sistema_GuiaLocal_Turismo.Models.ReservationStatus.Confirmed)
+                {
+                    <button onclick="cancelReservation(@Model.Id, '@Model.ReservationCode')"
+                            class="btn btn-outline-danger w-100 mb-2">
+                        <i class="fas fa-times"></i> Cancelar Reserva
+                    </button>
+                }
+
+                <a href="@Url.Action("MyReservations", "Home")" class="btn btn-outline-secondary w-100 mb-2">
+                    <i class="fas fa-arrow-left"></i> Volver a Mis Reservas
+                </a>
+
+                <a href="@Url.Action("Places", "Home")" class="btn btn-primary w-100">
+                    <i class="fas fa-plus"></i> Nueva Reserva
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function cancelReservation(id, code) {
+            if (confirm(`¿Estás seguro de que quieres cancelar la reserva ${code}?`)) {
+                fetch('@Url.Action("CancelReservation", "Home")', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                    },
+                    body: JSON.stringify({ id: id })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        location.reload();
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error al cancelar la reserva');
+                });
+            }
+        }
+    </script>
+
+    <style>
+        .reservation-detail-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .status-section {
+            padding: 0;
+        }
+
+        .status-banner {
+            padding: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: white;
+        }
+
+            .status-banner i {
+                font-size: 2rem;
+            }
+
+            .status-banner h4 {
+                margin: 0 0 0.25rem 0;
+            }
+
+            .status-banner p {
+                margin: 0;
+                opacity: 0.9;
+            }
+
+        .status-pending {
+            background: linear-gradient(135deg, #ffc107, #ff8f00);
+        }
+
+        .status-confirmed {
+            background: linear-gradient(135deg, #28a745, #20c997);
+        }
+
+        .status-cancelled {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+        }
+
+        .place-section, .details-section, .notes-section {
+            padding: 2rem;
+            border-bottom: 1px solid #f1f1f1;
+        }
+
+            .place-section:last-child, .details-section:last-child, .notes-section:last-child {
+                border-bottom: none;
+            }
+
+        .place-card {
+            display: flex;
+            gap: 1.5rem;
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+        }
+
+        .place-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .detail-card {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+            .detail-card i {
+                font-size: 2rem;
+                color: var(--primary-color);
+                margin-bottom: 1rem;
+            }
+
+            .detail-card h5 {
+                margin: 0 0 0.5rem 0;
+                color: #2c3e50;
+            }
+
+            .detail-card p {
+                margin: 0;
+                color: #495057;
+                font-weight: 500;
+            }
+
+            .detail-card .price {
+                font-size: 1.5rem;
+                font-weight: 700;
+                color: #28a745;
+            }
+
+        .notes-content {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .summary-card, .checkin-card, .actions-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+
+            .summary-item.total {
+                font-size: 1.1rem;
+                margin-bottom: 0;
+            }
+
+        .checkin-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+            .checkin-item:last-child {
+                margin-bottom: 0;
+            }
+
+            .checkin-item i {
+                font-size: 1.2rem;
+                margin-top: 0.25rem;
+            }
+
+        .status-pending {
+            color: #856404;
+        }
+
+        .status-confirmed {
+            color: #155724;
+        }
+
+        .status-cancelled {
+            color: #721c24;
+        }
+
+        @@media (max-width: 768px) {
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .place-card {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+}

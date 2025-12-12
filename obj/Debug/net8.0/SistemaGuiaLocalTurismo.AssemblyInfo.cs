@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SistemaGuiaLocalTurismo")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9c204f441c042929eff564c98cc3fbc088a30331")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e5c5c9f515261d798e667fd61e63b8a2187842fc")]
 [assembly: System.Reflection.AssemblyProductAttribute("SistemaGuiaLocalTurismo")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SistemaGuiaLocalTurismo")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
