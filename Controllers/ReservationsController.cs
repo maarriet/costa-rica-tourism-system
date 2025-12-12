@@ -365,11 +365,22 @@ namespace Sistema_GuiaLocal_Turismo.Controllers
         [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Edit(int id, ReservationViewModel viewModel)
         {
-            // DEBUG: Verificar que llega al método
-            TempData["DebugEdit"] = $"Edit POST ejecutado - ID: {id}, ReservationCode: {viewModel.ReservationCode}";
+            // DEBUG COMPLETO
+            TempData["DebugEdit"] = $"Edit POST - ID: {id}, ModelID: {viewModel.Id}, Valid: {ModelState.IsValid}";
+
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState
+                    .Where(x => x.Value.Errors.Count > 0)
+                    .Select(x => $"{x.Key}: {string.Join(", ", x.Value.Errors.Select(e => e.ErrorMessage))}")
+                    .ToList();
+
+                TempData["EditErrors"] = string.Join(" | ", errors);
+            }
 
             if (id != viewModel.Id)
             {
+                TempData["EditErrors"] = $"ID mismatch: URL={id}, Model={viewModel.Id}";
                 return NotFound();
             }
 
@@ -397,6 +408,9 @@ namespace Sistema_GuiaLocal_Turismo.Controllers
                 ModelState.AddModelError("PlaceId", "Lugar no encontrado");
             }
 
+            // DEBUG: Estado después de validaciones
+            TempData["DebugValidation"] = $"Después de validaciones - Valid: {ModelState.IsValid}";
+
             if (ModelState.IsValid)
             {
                 try
@@ -404,6 +418,7 @@ namespace Sistema_GuiaLocal_Turismo.Controllers
                     var reservation = await _context.Reservations.FindAsync(id);
                     if (reservation == null)
                     {
+                        TempData["EditErrors"] = "Reserva no encontrada en base de datos";
                         return NotFound();
                     }
 
@@ -428,16 +443,9 @@ namespace Sistema_GuiaLocal_Turismo.Controllers
                     TempData["SuccessMessage"] = $"Reserva {reservation.ReservationCode} actualizada exitosamente";
                     return RedirectToAction(nameof(Index));
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (Exception ex)
                 {
-                    if (!ReservationExists(viewModel.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    TempData["EditErrors"] = $"Error al guardar: {ex.Message}";
                 }
             }
 
