@@ -7,6 +7,26 @@
     <link href="~/css/styles.css" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 }
+@if (TempData["ValidationErrors"] != null)
+{
+    <div class="alert alert-danger">
+        <strong>Errores de validación:</strong> @TempData["ValidationErrors"]
+    </div>
+}
+
+@if (TempData["DateError"] != null)
+{
+    <div class="alert alert-warning">
+        <strong>Error de fecha:</strong> @TempData["DateError"]
+    </div>
+}
+
+@if (TempData["PlaceError"] != null)
+{
+    <div class="alert alert-info">
+        <strong>Error de lugar:</strong> @TempData["PlaceError"]
+    </div>
+}
 
 <div class="container">
     <div class="section-header">
