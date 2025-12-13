@@ -67,5 +67,6 @@ namespace Sistema_GuiaLocal_Turismo.ViewModels
         public DateTime UpdatedDate { get; set; }
         public DateTime? CheckInDate { get; set; }
         public DateTime? CheckOutDate { get; set; }
+        public bool AlertSent { get; set; } = false;
     }
 }

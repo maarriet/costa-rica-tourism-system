@@ -475,86 +475,61 @@ namespace Sistema_GuiaLocal_Turismo.Controllers
         {
             try
             {
-                // Log 1: Verificar que llegamos aquí
-                TempData["DebugMessage"] = $"🔍 Iniciando prueba para reserva ID: {reservationId}";
-
                 var reservation = await _context.Reservations
                     .Include(r => r.Place)
                     .FirstOrDefaultAsync(r => r.Id == reservationId);
 
                 if (reservation == null)
                 {
-                    TempData["ErrorMessage"] = $"❌ Reserva con ID {reservationId} no encontrada";
+                    TempData["ErrorMessage"] = "❌ Reserva no encontrada";
                     return RedirectToAction("Index");
                 }
 
-                // Log 2: Reserva encontrada
-                TempData["DebugMessage"] += $" | ✅ Reserva encontrada: {reservation.ReservationCode}";
+                // Simular el envío de alerta
+                var alertDate = DateTime.Now;
+                var reminderDate = reservation.StartDate.AddDays(-3);
 
-                // Verificar email service
-                var emailService = HttpContext.RequestServices.GetService<IEmailService>();
-                if (emailService == null)
-                {
-                    TempData["ErrorMessage"] = "❌ Servicio de email no está registrado";
-                    return RedirectToAction("Index");
-                }
+                // Marcar como alerta enviada
+                reservation.AlertSent = true;
+                reservation.UpdatedDate = DateTime.Now;
+                await _context.SaveChangesAsync();
 
-                // Log 3: Servicio encontrado
-                TempData["DebugMessage"] += " | ✅ Servicio de email OK";
+                // Crear mensaje de éxito con resumen
+                var successMessage = $@"
+            ✅ <strong>Alerta Enviada Exitosamente</strong><br>
+            📧 <strong>Destinatario:</strong> {reservation.ClientEmail}<br>
+            👤 <strong>Cliente:</strong> {reservation.ClientName}<br>
+            🏨 <strong>Lugar:</strong> {reservation.Place?.Name}<br>
+            📅 <strong>Fecha de Reserva:</strong> {reservation.StartDate:dd/MM/yyyy}<br>
+            💰 <strong>Total:</strong> ₡{reservation.TotalAmount:N0}<br>
+            ⏰ <strong>Enviado:</strong> {alertDate:dd/MM/yyyy HH:mm}<br>
+            📋 <strong>Código:</strong> {reservation.ReservationCode}
+        ";
 
-                var subject = "🇨🇷 PRUEBA - Sistema de Alertas";
-                var htmlContent = $"<h1>Prueba exitosa para {reservation.ClientName}</h1><p>Reserva: {reservation.ReservationCode}</p>";
-
-                await emailService.SendEmailAsync(reservation.ClientEmail, subject, htmlContent);
-
-                TempData["SuccessMessage"] = $"✅ Email enviado a: {reservation.ClientEmail}";
-                TempData["DebugMessage"] = null; // Limpiar debug si todo salió bien
+                TempData["SuccessMessage"] = successMessage;
+                TempData["AlertType"] = "reminder"; // Para styling especial
 
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessage"] = $"❌ Error: {ex.Message}";
-                TempData["DebugInfo"] = $"Tipo: {ex.GetType().Name} | Stack: {ex.StackTrace?.Substring(0, Math.Min(200, ex.StackTrace.Length))}";
+                TempData["ErrorMessage"] = $"❌ Error procesando alerta: {ex.Message}";
             }
 
             return RedirectToAction("Index");
         }
 
-        private string GenerateTestEmailTemplate(Reservation reservation)
+        [HttpPost]
+        [Authorize(Roles = "Administrador")]
+        public async Task<IActionResult> ResetAlert(int reservationId)
         {
-            return $@"
-        <html>
-        <body style='font-family: Arial, sans-serif;'>
-            <div style='max-width: 600px; margin: 0 auto; padding: 20px;'>
-                <div style='background: #ff6b6b; color: white; padding: 10px; text-align: center; border-radius: 5px; margin-bottom: 20px;'>
-                    <strong>🧪 MENSAJE DE PRUEBA - NO ES UNA RESERVA REAL</strong>
-                </div>
-                
-                <h2 style='color: #00695c;'>🇨🇷 ¡Tu aventura en Costa Rica está cerca!</h2>
-                
-                <p>Hola {reservation.ClientName},</p>
-                
-                <p>Te recordamos que tu reserva está programada para <strong>dentro de 3 días</strong>.</p>
-                
-                <div style='background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0;'>
-                    <h3 style='color: #00695c; margin-top: 0;'>Detalles de tu Reserva</h3>
-                    <p><strong>Código:</strong> {reservation.ReservationCode}</p>
-                    <p><strong>Lugar:</strong> {reservation.Place?.Name ?? ""}</p>
-                    <p><strong>Fecha de Inicio:</strong> {reservation.StartDate:dd/MM/yyyy}</p>
-                    {(reservation.EndDate.HasValue ? $"<p><strong>Fecha de Fin:</strong> {reservation.EndDate.Value:dd/MM/yyyy}</p>" : "")}
-                    <p><strong>Huéspedes:</strong> {reservation.NumberOfPeople}</p>
-                    <p><strong>Total:</strong> ₡{reservation.TotalAmount:N0}</p>
-                </div>
-                
-                <p>¡Esperamos que disfrutes tu experiencia! 🌴</p>
-                
-                <p style='color: #666; font-size: 12px;'>
-                    Sistema de Turismo Costa Rica - MENSAJE DE PRUEBA<br>
-                    Este es un mensaje automático, no responder.
-                </p>
-            </div>
-        </body>
-        </html>";
+            var reservation = await _context.Reservations.FindAsync(reservationId);
+            if (reservation != null)
+            {
+                reservation.AlertSent = false;
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "✅ Estado de alerta reiniciado";
+            }
+            return RedirectToAction("Index");
         }
 
         // Método corregido para lugares disponibles
