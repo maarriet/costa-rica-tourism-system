@@ -238,10 +238,25 @@ namespace Sistema_GuiaLocal_Turismo.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, PlaceViewModel model)
         {
+            // DEBUG: Verificar errores de validación
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState
+                    .Where(x => x.Value.Errors.Count > 0)
+                    .Select(x => $"{x.Key}: {string.Join(", ", x.Value.Errors.Select(e => e.ErrorMessage))}")
+                    .ToList();
+
+                TempData["PlaceEditErrors"] = string.Join(" | ", errors);
+            }
+
+            TempData["PlaceEditDebug"] = $"ID: {id}, ModelID: {model.Id}, Valid: {ModelState.IsValid}";
+
             if (id != model.Id)
             {
                 return NotFound();
             }
+
+            // Llenar campos automáticamente
             if (model.CategoryId > 0)
             {
                 var category = await _context.Categories.FindAsync(model.CategoryId);
