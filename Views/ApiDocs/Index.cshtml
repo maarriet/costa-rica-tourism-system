@@ -140,6 +140,9 @@
                         <button class="test-button" onclick="testEndpoint('GET', '/api/places', null, 'response1')">
                             🧪 Probar
                         </button>
+                        <button class="test-button" onclick="testEndpoint('GET', '/api/testapi', null, 'testResponse')">
+                            🧪 Test Básico
+                        </button>
                     </span>
                 </div>
                 <p><strong>Descripción:</strong> Obtiene todos los lugares turísticos</p>
@@ -238,16 +241,16 @@
                 <p><strong>Body (JSON):</strong></p>
                 <div id="createReservationForm" style="display: none; margin-top: 1rem;">
                     <textarea id="reservationJson" rows="8" style="width: 100%; font-family: monospace;">
-{
-  "placeId": 1,
-  "clientName": "Juan Pérez",
-  "clientEmail": "juan@email.com",
-  "clientPhone": "8888-8888",
-  "startDate": "2024-02-15",
-  "endDate": "2024-02-17",
-  "numberOfPeople": 2,
-  "totalAmount": 240.00
-}</textarea>
+                    {
+                      "placeId": 1,
+                      "clientName": "Juan Pérez",
+                      "clientEmail": "juan@email.com",
+                      "clientPhone": "8888-8888",
+                      "startDate": "2024-02-15",
+                      "endDate": "2024-02-17",
+                      "numberOfPeople": 2,
+                      "totalAmount": 240.00
+                    }</textarea>
                     <br>
                     <button class="test-button" onclick="testCreateReservation()">
                         ✅ Enviar Reserva

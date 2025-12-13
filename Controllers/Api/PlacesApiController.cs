@@ -8,7 +8,7 @@ using Sistema_GuiaLocal_Turismo.Models;
 namespace Sistema_GuiaLocal_Turismo.Controllers.Api
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/places")]
     [AllowAnonymous]
     public class PlacesApiController : ControllerBase
     {
