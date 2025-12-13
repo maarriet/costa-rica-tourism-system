@@ -1,16 +1,196 @@
-﻿@{
-    ViewData["Title"] = "Reportes - Sistema de Turismo";
+﻿<!-- Views/Reports/Index.cshtml -->
+@model ReportsViewModel
+@{
+    ViewData["Title"] = "Reportes Avanzados";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="compact-header">
-    <div class="header-content">
-        <div class="header-main">
-            <h1><i class="fas fa-chart-bar"></i> Reportes y Estadísticas</h1>
-            <p>Análisis detallado del sistema de turismo</p>
+@section styles {
+    <style>
+        .report-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .report-header {
+            background: linear-gradient(135deg, #00695c 0%, #26a69a 100%);
+            color: white;
+            padding: 1rem;
+        }
+
+        .report-content {
+            padding: 1.5rem;
+        }
+
+        .metric-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            border-left: 4px solid #00695c;
+        }
+
+        .metric-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #00695c;
+        }
+
+        .metric-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+    </style>
+}
+
+<nav class="breadcrumb-nav">
+    <div class="breadcrumb">
+        <div class="breadcrumb-items">
+            <a href="/Dashboard"><i class="fas fa-home"></i> Dashboard</a>
+            <span>/</span>
+            <span><i class="fas fa-chart-bar"></i> Reportes</span>
+        </div>
+        <a href="/Dashboard/Index" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Volver
+        </a>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="section-header">
+        <h2><i class="fas fa-chart-bar"></i> Reportes Avanzados</h2>
+        <div class="section-actions">
+            <button class="btn btn-success" onclick="exportData()">
+                <i class="fas fa-download"></i> Exportar CSV
+            </button>
+        </div>
+    </div>
+
+    <!-- Lugares Más Visitados -->
+    <div class="report-card">
+        <div class="report-header">
+            <h4><i class="fas fa-trophy"></i> Top 10 - Lugares Más Visitados</h4>
+        </div>
+        <div class="report-content">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Lugar</th>
+                            <th>Categoría</th>
+                            <th>Reservas</th>
+                            <th>Huéspedes</th>
+                            <th>Ingresos</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < Model.MostVisitedPlaces.Count; i++)
+                        {
+                            var place = Model.MostVisitedPlaces[i];
+                            <tr>
+                                <td><span class="badge bg-primary">@(i + 1)</span></td>
+                                <td><strong>@place.PlaceName</strong></td>
+                                <td><span class="badge bg-info">@place.Category</span></td>
+                                <td>@place.TotalReservations</td>
+                                <td>@place.TotalGuests</td>
+                                <td><strong>₡@place.TotalRevenue.ToString("N0")</strong></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reservas por Mes -->
+    <div class="report-card">
+        <div class="report-header">
+            <h4><i class="fas fa-calendar-alt"></i> Tendencia Mensual de Reservas</h4>
+        </div>
+        <div class="report-content">
+            <canvas id="monthlyChart" height="100"></canvas>
+        </div>
+    </div>
+
+    <!-- Ocupación por Categoría -->
+    <div class="report-card">
+        <div class="report-header">
+            <h4><i class="fas fa-chart-pie"></i> Análisis por Categoría</h4>
+        </div>
+        <div class="report-content">
+            <div class="row">
+                @foreach (var category in Model.OccupancyByCategory)
+                {
+                    <div class="col-md-4 mb-3">
+                        <div class="metric-card">
+                            <h5>@category.CategoryName</h5>
+                            <div class="metric-number">@category.TotalReservations</div>
+                            <div class="metric-label">Reservas</div>
+                            <hr>
+                            <small>
+                                <strong>@category.TotalGuests</strong> huéspedes<br>
+                                <strong>₡@category.TotalRevenue.ToString("N0")</strong> ingresos
+                            </small>
+                        </div>
+                    </div>
+                }
+            </div>
         </div>
     </div>
 </div>
 
-<div class="container">
-    <h2>Reportes disponibles próximamente...</h2>
-</div>
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Gráfico de tendencia mensual
+        const ctx = document.getElementById('monthlyChart').getContext('2d');
+        const monthlyData = @Html.Raw(Json.Serialize(Model.ReservationsByMonth));
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: monthlyData.map(d => d.monthName),
+                datasets: [{
+                    label: 'Reservas',
+                    data: monthlyData.map(d => d.totalReservations),
+                    borderColor: '#00695c',
+                    backgroundColor: 'rgba(0, 105, 92, 0.1)',
+                    tension: 0.4
+                }, {
+                    label: 'Ingresos (₡)',
+                    data: monthlyData.map(d => d.totalRevenue),
+                    borderColor: '#26a69a',
+                    backgroundColor: 'rgba(38, 166, 154, 0.1)',
+                    yAxisID: 'y1',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                    },
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        grid: {
+                            drawOnChartArea: false,
+                        },
+                    }
+                }
+            }
+        });
+
+        function exportData() {
+            window.open('/Reports/ExportReservations', '_blank');
+        }
+    </script>
+}

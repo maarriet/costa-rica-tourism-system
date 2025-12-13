@@ -501,7 +501,7 @@ namespace Sistema_GuiaLocal_Turismo.Controllers
             👤 <strong>Cliente:</strong> {reservation.ClientName}<br>
             🏨 <strong>Lugar:</strong> {reservation.Place?.Name}<br>
             📅 <strong>Fecha de Reserva:</strong> {reservation.StartDate:dd/MM/yyyy}<br>
-            💰 <strong>Total:</strong> ₡{reservation.TotalAmount:N0}<br>
+            💰 <strong>Total:</strong> ${reservation.TotalAmount:N0}<br>
             ⏰ <strong>Enviado:</strong> {alertDate:dd/MM/yyyy HH:mm}<br>
             📋 <strong>Código:</strong> {reservation.ReservationCode}
         ";
