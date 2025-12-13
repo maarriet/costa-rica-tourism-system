@@ -80,7 +80,9 @@ namespace Sistema_GuiaLocal_Turismo.Controllers
                     CheckOutDate = r.CheckOutDate,
                     Notes = r.Notes,
                     PlacePrice = r.Place.Price,
-                    DaysUntilReservation = (int)(r.StartDate - DateTime.Now).TotalDays
+                    DaysUntilReservation = (int)(r.StartDate - DateTime.Now).TotalDays,
+                    CreatedDate = r.CreatedDate,
+                    UpdatedDate = r.UpdatedDate
                 })
                 .ToListAsync();
 
@@ -154,7 +156,9 @@ namespace Sistema_GuiaLocal_Turismo.Controllers
                 CheckOutDate = reservation.CheckOutDate,
                 Notes = reservation.Notes,
                 PlacePrice = reservation.Place.Price,
-                DaysUntilReservation = (int)(reservation.StartDate - DateTime.Now).TotalDays
+                DaysUntilReservation = (int)(reservation.StartDate - DateTime.Now).TotalDays,
+                CreatedDate = reservation.CreatedDate,
+                UpdatedDate = reservation.UpdatedDate
             };
 
             return View(viewModel);
