@@ -467,34 +467,54 @@ namespace Sistema_GuiaLocal_Turismo.Controllers
 
             return View(viewModel);
         }
-        // En ReservationsController.cs
-        [HttpPost]
-        [Authorize(Roles = "Administrador")]
+
         // En ReservationsController.cs
         [HttpPost]
         [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> TestAlert(int reservationId)
         {
-            var reservation = await _context.Reservations
-                .Include(r => r.Place)
-                .FirstOrDefaultAsync(r => r.Id == reservationId);
-
-            if (reservation == null)
-                return NotFound();
-
-            var emailService = HttpContext.RequestServices.GetRequiredService<IEmailService>();
-
-            var subject = "🇨🇷 PRUEBA - Recordatorio: Tu reserva en Costa Rica";
-            var htmlContent = GenerateTestEmailTemplate(reservation);
-
             try
             {
+                // Log 1: Verificar que llegamos aquí
+                TempData["DebugMessage"] = $"🔍 Iniciando prueba para reserva ID: {reservationId}";
+
+                var reservation = await _context.Reservations
+                    .Include(r => r.Place)
+                    .FirstOrDefaultAsync(r => r.Id == reservationId);
+
+                if (reservation == null)
+                {
+                    TempData["ErrorMessage"] = $"❌ Reserva con ID {reservationId} no encontrada";
+                    return RedirectToAction("Index");
+                }
+
+                // Log 2: Reserva encontrada
+                TempData["DebugMessage"] += $" | ✅ Reserva encontrada: {reservation.ReservationCode}";
+
+                // Verificar email service
+                var emailService = HttpContext.RequestServices.GetService<IEmailService>();
+                if (emailService == null)
+                {
+                    TempData["ErrorMessage"] = "❌ Servicio de email no está registrado";
+                    return RedirectToAction("Index");
+                }
+
+                // Log 3: Servicio encontrado
+                TempData["DebugMessage"] += " | ✅ Servicio de email OK";
+
+                var subject = "🇨🇷 PRUEBA - Sistema de Alertas";
+                var htmlContent = $"<h1>Prueba exitosa para {reservation.ClientName}</h1><p>Reserva: {reservation.ReservationCode}</p>";
+
                 await emailService.SendEmailAsync(reservation.ClientEmail, subject, htmlContent);
-                TempData["SuccessMessage"] = $"Alerta de prueba enviada a {reservation.ClientEmail}";
+
+                TempData["SuccessMessage"] = $"✅ Email enviado a: {reservation.ClientEmail}";
+                TempData["DebugMessage"] = null; // Limpiar debug si todo salió bien
+
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessage"] = $"Error enviando alerta: {ex.Message}";
+                TempData["ErrorMessage"] = $"❌ Error: {ex.Message}";
+                TempData["DebugInfo"] = $"Tipo: {ex.GetType().Name} | Stack: {ex.StackTrace?.Substring(0, Math.Min(200, ex.StackTrace.Length))}";
             }
 
             return RedirectToAction("Index");
