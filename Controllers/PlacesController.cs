@@ -318,19 +318,74 @@ namespace Sistema_GuiaLocal_Turismo.Controllers
         new SelectListItem { Value = "5", Text = "Bodas" }
     };
         }
-        public IActionResult Delete(int id)
+        // GET: Places/Delete/5
+        public async Task<IActionResult> Delete(int? id)
         {
-            var place = GetTestPlace(id);
-            if (place == null)
+            if (id == null)
+            {
                 return NotFound();
+            }
 
-            return View(place);
+            var place = await _context.Places
+                .Include(p => p.Category)
+                .FirstOrDefaultAsync(p => p.Id == id);
+
+            if (place == null)
+            {
+                return NotFound();
+            }
+
+            var viewModel = new PlaceViewModel
+            {
+                Id = place.Id,
+                Code = place.Code,
+                Name = place.Name,
+                Description = place.Description,
+                CategoryId = place.CategoryId,
+                CategoryName = place.Category?.Name,
+                CategoryIcon = place.Category?.Icon,
+                CategoryColor = place.Category?.Color,
+                Price = place.Price,
+                Capacity = place.Capacity,
+                Location = place.Location,
+                Status = place.Status,
+                CreatedDate = place.CreatedDate,
+                UpdatedDate = place.UpdatedDate,
+                // Valores por defecto
+                ReservationCount = 0,
+                ActiveReservations = 0,
+                CurrentOccupancy = 0,
+                TotalRevenue = 0,
+                MonthlyRevenue = 0,
+                OccupancyRate = 0
+            };
+
+            return View(viewModel);
         }
 
-        [HttpPost]
-        public IActionResult Delete(PlaceViewModel model)
+        // POST: Places/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            TempData["Success"] = $"Lugar '{model.Name}' eliminado exitosamente!";
+            var place = await _context.Places.FindAsync(id);
+            if (place == null)
+            {
+                return NotFound();
+            }
+
+            // Verificar si tiene reservas asociadas
+            var hasReservations = await _context.Reservations.AnyAsync(r => r.PlaceId == id);
+            if (hasReservations)
+            {
+                TempData["Error"] = "No se puede eliminar el lugar porque tiene reservas asociadas.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            _context.Places.Remove(place);
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = $"Lugar '{place.Name}' eliminado exitosamente!";
             return RedirectToAction(nameof(Index));
         }
 
