@@ -1,4 +1,5 @@
 ﻿// Controllers/Api/PlacesApiController.cs
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Sistema_GuiaLocal_Turismo.Data;
@@ -8,6 +9,7 @@ namespace Sistema_GuiaLocal_Turismo.Controllers.Api
 {
     [ApiController]
     [Route("api/[controller]")]
+    [AllowAnonymous]
     public class PlacesApiController : ControllerBase
     {
         private readonly TourismContext _context;

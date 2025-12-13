@@ -312,8 +312,7 @@ curl -X POST "<span id="curlBaseUrl2"></span>/api/reservations" \
         document.getElementById('curlBaseUrl').textContent = baseUrl;
         document.getElementById('curlBaseUrl2').textContent = baseUrl;
 
-        // Función para probar endpoints
-        async function testEndpoint(method, endpoint, body, responseId) {
+                async function testEndpoint(method, endpoint, body, responseId) {
             const responseDiv = document.getElementById(responseId);
             responseDiv.style.display = 'block';
             responseDiv.innerHTML = '⏳ Cargando...';
@@ -331,16 +330,35 @@ curl -X POST "<span id="curlBaseUrl2"></span>/api/reservations" \
                 }
 
                 const response = await fetch(baseUrl + endpoint, options);
-                const data = await response.json();
+
+                // Verificar si la respuesta es exitosa
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                // Verificar si hay contenido
+                const text = await response.text();
+                if (!text) {
+                    throw new Error('Respuesta vacía del servidor');
+                }
+
+                // Intentar parsear JSON
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch (e) {
+                    throw new Error(`Respuesta no es JSON válido: ${text.substring(0, 100)}...`);
+                }
 
                 responseDiv.innerHTML = `
-                    <strong>Status:</strong> ${response.status} ${response.statusText}<br>
-                    <strong>Response:</strong><br>
+                    <strong>✅ Status:</strong> ${response.status} ${response.statusText}<br>
+                    <strong>📄 Response:</strong><br>
                     <pre>${JSON.stringify(data, null, 2)}</pre>
                 `;
             } catch (error) {
                 responseDiv.innerHTML = `
-                    <strong>Error:</strong> ${error.message}
+                    <strong>❌ Error:</strong> ${error.message}<br>
+                    <strong>🔍 Endpoint:</strong> ${method} ${baseUrl + endpoint}
                 `;
             }
         }
