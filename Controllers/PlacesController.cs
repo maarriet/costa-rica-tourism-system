@@ -238,6 +238,27 @@ namespace Sistema_GuiaLocal_Turismo.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, PlaceViewModel model)
         {
+            if (id != model.Id)
+            {
+                return NotFound();
+            }
+
+            // LLENAR CAMPOS AUTOMÁTICAMENTE ANTES DE VALIDAR
+            if (model.CategoryId > 0)
+            {
+                var category = await _context.Categories.FindAsync(model.CategoryId);
+                if (category != null)
+                {
+                    model.CategoryName = category.Name;
+                    model.CategoryIcon = category.Icon ?? "";
+                    model.CategoryColor = category.Color ?? "";
+                }
+            }
+
+            // Asegurar que los campos no estén vacíos
+            model.CategoryIcon = model.CategoryIcon ?? "";
+            model.CategoryColor = model.CategoryColor ?? "";
+
             // DEBUG: Verificar errores de validación
             if (!ModelState.IsValid)
             {
@@ -249,24 +270,7 @@ namespace Sistema_GuiaLocal_Turismo.Controllers
                 TempData["PlaceEditErrors"] = string.Join(" | ", errors);
             }
 
-            TempData["PlaceEditDebug"] = $"ID: {id}, ModelID: {model.Id}, Valid: {ModelState.IsValid}";
-
-            if (id != model.Id)
-            {
-                return NotFound();
-            }
-
-            // Llenar campos automáticamente
-            if (model.CategoryId > 0)
-            {
-                var category = await _context.Categories.FindAsync(model.CategoryId);
-                if (category != null)
-                {
-                    model.CategoryName = category.Name;
-                    model.CategoryIcon = category.Icon;
-                    model.CategoryColor = category.Color;
-                }
-            }
+            TempData["PlaceEditDebug"] = $"ID: {id}, ModelID: {model.Id}, Valid: {ModelState.IsValid}, CategoryIcon: '{model.CategoryIcon}', CategoryColor: '{model.CategoryColor}'";
 
             if (ModelState.IsValid)
             {
@@ -294,17 +298,6 @@ namespace Sistema_GuiaLocal_Turismo.Controllers
 
                     TempData["Success"] = $"Lugar '{model.Name}' actualizado exitosamente!";
                     return RedirectToAction(nameof(Index));
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!PlaceExists(model.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
                 }
                 catch (Exception ex)
                 {
