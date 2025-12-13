@@ -259,6 +259,20 @@ namespace Sistema_GuiaLocal_Turismo.Controllers
             model.CategoryIcon = model.CategoryIcon ?? "";
             model.CategoryColor = model.CategoryColor ?? "";
 
+            // FORZAR remover errores de estos campos problemáticos
+            if (ModelState.ContainsKey("CategoryIcon"))
+            {
+                ModelState.Remove("CategoryIcon");
+            }
+            if (ModelState.ContainsKey("CategoryColor"))
+            {
+                ModelState.Remove("CategoryColor");
+            }
+            if (ModelState.ContainsKey("CategoryName"))
+            {
+                ModelState.Remove("CategoryName");
+            }
+
             // DEBUG: Verificar errores de validación
             if (!ModelState.IsValid)
             {
