@@ -470,11 +470,13 @@ namespace Sistema_GuiaLocal_Turismo.Controllers
         // En ReservationsController.cs
         [HttpPost]
         [Authorize(Roles = "Administrador")]
+        // En ReservationsController.cs
+        [HttpPost]
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> TestAlert(int reservationId)
         {
             var reservation = await _context.Reservations
                 .Include(r => r.Place)
-                .Include(r => r.ClientName)
                 .FirstOrDefaultAsync(r => r.Id == reservationId);
 
             if (reservation == null)
@@ -482,7 +484,7 @@ namespace Sistema_GuiaLocal_Turismo.Controllers
 
             var emailService = HttpContext.RequestServices.GetRequiredService<IEmailService>();
 
-            var subject = "🇨🇷 Recordatorio: Tu reserva en Costa Rica es en 3 días";
+            var subject = "🇨🇷 PRUEBA - Recordatorio: Tu reserva en Costa Rica";
             var htmlContent = GenerateTestEmailTemplate(reservation);
 
             try
@@ -504,18 +506,22 @@ namespace Sistema_GuiaLocal_Turismo.Controllers
         <html>
         <body style='font-family: Arial, sans-serif;'>
             <div style='max-width: 600px; margin: 0 auto; padding: 20px;'>
+                <div style='background: #ff6b6b; color: white; padding: 10px; text-align: center; border-radius: 5px; margin-bottom: 20px;'>
+                    <strong>🧪 MENSAJE DE PRUEBA - NO ES UNA RESERVA REAL</strong>
+                </div>
+                
                 <h2 style='color: #00695c;'>🇨🇷 ¡Tu aventura en Costa Rica está cerca!</h2>
                 
                 <p>Hola {reservation.ClientName},</p>
                 
-                <p><strong>ESTA ES UNA PRUEBA</strong> - Te recordamos que tu reserva está programada para <strong>dentro de 3 días</strong>.</p>
+                <p>Te recordamos que tu reserva está programada para <strong>dentro de 3 días</strong>.</p>
                 
                 <div style='background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0;'>
                     <h3 style='color: #00695c; margin-top: 0;'>Detalles de tu Reserva</h3>
                     <p><strong>Código:</strong> {reservation.ReservationCode}</p>
-                    <p><strong>Lugar:</strong> {reservation.Place.Name}</p>
-                    <p><strong>Fecha de Entrada:</strong> {reservation.CheckInDate:dd/MM/yyyy}</p>
-                    <p><strong>Fecha de Salida:</strong> {reservation.CheckOutDate:dd/MM/yyyy}</p>
+                    <p><strong>Lugar:</strong> {reservation.Place?.Name ?? ""}</p>
+                    <p><strong>Fecha de Inicio:</strong> {reservation.StartDate:dd/MM/yyyy}</p>
+                    {(reservation.EndDate.HasValue ? $"<p><strong>Fecha de Fin:</strong> {reservation.EndDate.Value:dd/MM/yyyy}</p>" : "")}
                     <p><strong>Huéspedes:</strong> {reservation.NumberOfPeople}</p>
                     <p><strong>Total:</strong> ₡{reservation.TotalAmount:N0}</p>
                 </div>

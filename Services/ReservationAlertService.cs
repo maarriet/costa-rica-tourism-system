@@ -33,10 +33,10 @@ namespace Sistema_GuiaLocal_Turismo.Services
 
             var threeDaysFromNow = DateTime.Now.AddDays(3).Date;
 
+            // ✅ CORRECTO - Usar StartDate en lugar de CheckInDate
             var upcomingReservations = await context.Reservations
                 .Include(r => r.Place)
-                .Include(r => r.ClientName)
-                .Where(r => r.CheckInDate == threeDaysFromNow && !r.AlertSent)
+                .Where(r => r.StartDate.Date == threeDaysFromNow && !r.AlertSent)
                 .ToListAsync();
 
             foreach (var reservation in upcomingReservations)
@@ -45,12 +45,17 @@ namespace Sistema_GuiaLocal_Turismo.Services
                 reservation.AlertSent = true;
             }
 
-            await context.SaveChangesAsync();
+            if (upcomingReservations.Any())
+            {
+                await context.SaveChangesAsync();
+            }
+
+            _logger.LogInformation($"Procesadas {upcomingReservations.Count} alertas de reservas");
         }
 
         private async Task SendReservationAlert(Reservation reservation, IEmailService emailService)
         {
-            var subject = "Recordatorio: Tu reserva en Costa Rica es en 3 días";
+            var subject = "🇨🇷 Recordatorio: Tu reserva en Costa Rica es en 3 días";
             var htmlContent = GenerateEmailTemplate(reservation);
 
             try
@@ -60,7 +65,7 @@ namespace Sistema_GuiaLocal_Turismo.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error enviando alerta: {ex.Message}");
+                _logger.LogError(ex, $"Error enviando alerta para reserva {reservation.ReservationCode}");
             }
         }
 
@@ -79,9 +84,9 @@ namespace Sistema_GuiaLocal_Turismo.Services
                         <div style='background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0;'>
                             <h3 style='color: #00695c; margin-top: 0;'>Detalles de tu Reserva</h3>
                             <p><strong>Código:</strong> {reservation.ReservationCode}</p>
-                            <p><strong>Lugar:</strong> {reservation.Place.Name}</p>
-                            <p><strong>Fecha de Entrada:</strong> {reservation.CheckInDate:dd/MM/yyyy}</p>
-                            <p><strong>Fecha de Salida:</strong> {reservation.CheckOutDate:dd/MM/yyyy}</p>
+                            <p><strong>Lugar:</strong> {reservation.Place?.Name ?? ""}</p>
+                            <p><strong>Fecha de Inicio:</strong> {reservation.StartDate:dd/MM/yyyy}</p>
+                            {(reservation.EndDate.HasValue ? $"<p><strong>Fecha de Fin:</strong> {reservation.EndDate.Value:dd/MM/yyyy}</p>" : "")}
                             <p><strong>Huéspedes:</strong> {reservation.NumberOfPeople}</p>
                             <p><strong>Total:</strong> ₡{reservation.TotalAmount:N0}</p>
                         </div>
