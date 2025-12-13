@@ -242,6 +242,16 @@ namespace Sistema_GuiaLocal_Turismo.Controllers
             {
                 return NotFound();
             }
+            if (model.CategoryId > 0)
+            {
+                var category = await _context.Categories.FindAsync(model.CategoryId);
+                if (category != null)
+                {
+                    model.CategoryName = category.Name;
+                    model.CategoryIcon = category.Icon;
+                    model.CategoryColor = category.Color;
+                }
+            }
 
             if (ModelState.IsValid)
             {
