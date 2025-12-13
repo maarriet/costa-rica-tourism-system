@@ -1,0 +1,388 @@
+﻿<!-- Views/ApiDocs/Index.cshtml -->
+@{
+    ViewData["Title"] = "API REST - Documentación";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section styles {
+    <style>
+        .api-section {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .api-header {
+            background: linear-gradient(135deg, #00695c 0%, #26a69a 100%);
+            color: white;
+            padding: 1rem;
+        }
+
+        .api-content {
+            padding: 1.5rem;
+        }
+
+        .endpoint {
+            background: #f8f9fa;
+            border-left: 4px solid #00695c;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 5px;
+        }
+
+        .method {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.8rem;
+            margin-right: 0.5rem;
+        }
+
+        .get {
+            background: #28a745;
+            color: white;
+        }
+
+        .post {
+            background: #007bff;
+            color: white;
+        }
+
+        .put {
+            background: #ffc107;
+            color: black;
+        }
+
+        .delete {
+            background: #dc3545;
+            color: white;
+        }
+
+        .test-button {
+            background: #17a2b8;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 0.5rem;
+        }
+
+            .test-button:hover {
+                background: #138496;
+            }
+
+        .response-area {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-top: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .base-url {
+            background: #e9ecef;
+            padding: 0.5rem;
+            border-radius: 5px;
+            font-family: monospace;
+            margin-bottom: 1rem;
+        }
+    </style>
+}
+
+<nav class="breadcrumb-nav">
+    <div class="breadcrumb">
+        <div class="breadcrumb-items">
+            <a href="/Dashboard"><i class="fas fa-home"></i> Dashboard</a>
+            <span>/</span>
+            <span><i class="fas fa-code"></i> API REST</span>
+        </div>
+        <a href="/Dashboard/Index" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Volver
+        </a>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="section-header">
+        <h2><i class="fas fa-code"></i> API REST - Documentación Interactiva</h2>
+        <div class="section-actions">
+            <span class="badge bg-success">✅ API Activa</span>
+        </div>
+    </div>
+
+    <!-- URL Base -->
+    <div class="base-url">
+        <strong>URL Base:</strong> <span id="baseUrl"></span>
+    </div>
+
+    <!-- Lugares API -->
+    <div class="api-section">
+        <div class="api-header">
+            <h4><i class="fas fa-map-marker-alt"></i> Lugares API</h4>
+        </div>
+        <div class="api-content">
+
+            <!-- GET /api/places -->
+            <div class="endpoint">
+                <div>
+                    <span class="method get">GET</span>
+                    <code>/api/places</code>
+                    <span class="float-end">
+                        <button class="test-button" onclick="testEndpoint('GET', '/api/places', null, 'response1')">
+                            🧪 Probar
+                        </button>
+                    </span>
+                </div>
+                <p><strong>Descripción:</strong> Obtiene todos los lugares turísticos</p>
+                <p><strong>Respuesta:</strong> Lista de lugares con información completa</p>
+                <div id="response1" class="response-area"></div>
+            </div>
+
+            <!-- GET /api/places/available -->
+            <div class="endpoint">
+                <div>
+                    <span class="method get">GET</span>
+                    <code>/api/places/available</code>
+                    <span class="float-end">
+                        <button class="test-button" onclick="testEndpoint('GET', '/api/places/available', null, 'response2')">
+                            🧪 Probar
+                        </button>
+                    </span>
+                </div>
+                <p><strong>Descripción:</strong> Obtiene solo lugares disponibles</p>
+                <p><strong>Respuesta:</strong> Lista filtrada de lugares disponibles</p>
+                <div id="response2" class="response-area"></div>
+            </div>
+
+            <!-- GET /api/places/{id} -->
+            <div class="endpoint">
+                <div>
+                    <span class="method get">GET</span>
+                    <code>/api/places/{id}</code>
+                    <span class="float-end">
+                        <input type="number" id="placeId" placeholder="ID" style="width: 60px; margin-right: 5px;">
+                        <button class="test-button" onclick="testPlaceById()">
+                            🧪 Probar
+                        </button>
+                    </span>
+                </div>
+                <p><strong>Descripción:</strong> Obtiene un lugar específico por ID</p>
+                <p><strong>Parámetros:</strong> <code>id</code> - ID del lugar</p>
+                <div id="response3" class="response-area"></div>
+            </div>
+
+            <!-- GET /api/places/{id}/availability -->
+            <div class="endpoint">
+                <div>
+                    <span class="method get">GET</span>
+                    <code>/api/places/{id}/availability</code>
+                    <span class="float-end">
+                        <input type="number" id="availabilityPlaceId" placeholder="ID" style="width: 60px; margin-right: 5px;">
+                        <button class="test-button" onclick="testAvailability()">
+                            🧪 Probar
+                        </button>
+                    </span>
+                </div>
+                <p><strong>Descripción:</strong> Consulta disponibilidad de un lugar</p>
+                <p><strong>Parámetros opcionales:</strong> <code>startDate</code>, <code>endDate</code></p>
+                <div id="response4" class="response-area"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Reservas API -->
+    <div class="api-section">
+        <div class="api-header">
+            <h4><i class="fas fa-calendar-check"></i> Reservas API</h4>
+        </div>
+        <div class="api-content">
+
+            <!-- GET /api/reservations -->
+            <div class="endpoint">
+                <div>
+                    <span class="method get">GET</span>
+                    <code>/api/reservations</code>
+                    <span class="float-end">
+                        <button class="test-button" onclick="testEndpoint('GET', '/api/reservations', null, 'response5')">
+                            🧪 Probar
+                        </button>
+                    </span>
+                </div>
+                <p><strong>Descripción:</strong> Obtiene todas las reservas</p>
+                <p><strong>Parámetros opcionales:</strong> <code>placeId</code>, <code>startDate</code>, <code>endDate</code></p>
+                <div id="response5" class="response-area"></div>
+            </div>
+
+            <!-- POST /api/reservations -->
+            <div class="endpoint">
+                <div>
+                    <span class="method post">POST</span>
+                    <code>/api/reservations</code>
+                    <span class="float-end">
+                        <button class="test-button" onclick="showCreateReservationForm()">
+                            🧪 Probar
+                        </button>
+                    </span>
+                </div>
+                <p><strong>Descripción:</strong> Crea una nueva reserva</p>
+                <p><strong>Body (JSON):</strong></p>
+                <div id="createReservationForm" style="display: none; margin-top: 1rem;">
+                    <textarea id="reservationJson" rows="8" style="width: 100%; font-family: monospace;">
+{
+  "placeId": 1,
+  "clientName": "Juan Pérez",
+  "clientEmail": "juan@email.com",
+  "clientPhone": "8888-8888",
+  "startDate": "2024-02-15",
+  "endDate": "2024-02-17",
+  "numberOfPeople": 2,
+  "totalAmount": 240.00
+}</textarea>
+                    <br>
+                    <button class="test-button" onclick="testCreateReservation()">
+                        ✅ Enviar Reserva
+                    </button>
+                </div>
+                <div id="response6" class="response-area"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Ejemplos de Uso -->
+    <div class="api-section">
+        <div class="api-header">
+            <h4><i class="fas fa-lightbulb"></i> Ejemplos de Uso</h4>
+        </div>
+        <div class="api-content">
+            <h5>JavaScript/Fetch:</h5>
+            <pre style="background: #f8f9fa; padding: 1rem; border-radius: 5px;"><code>// Obtener lugares disponibles
+fetch('/api/places/available')
+  .then(response => response.json())
+  .then(data => {
+    console.log('Lugares disponibles:', data.data);
+  });
+
+// Crear una reserva
+fetch('/api/reservations', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    placeId: 1,
+    clientName: "María García",
+    clientEmail: "maria@email.com",
+    startDate: "2024-02-20",
+    numberOfPeople: 3,
+    totalAmount: 360.00
+  })
+})
+.then(response => response.json())
+.then(data => console.log('Reserva creada:', data));</code></pre>
+
+            <h5>cURL:</h5>
+            <pre style="background: #f8f9fa; padding: 1rem; border-radius: 5px;"><code># Obtener lugares
+curl -X GET "<span id="curlBaseUrl"></span>/api/places"
+
+# Crear reserva
+curl -X POST "<span id="curlBaseUrl2"></span>/api/reservations" \
+  -H "Content-Type: application/json" \
+  -d '{"placeId":1,"clientName":"Test","clientEmail":"test@email.com","startDate":"2024-02-15","numberOfPeople":2,"totalAmount":200}'</code></pre>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    <script>
+        // Configurar URL base
+        const baseUrl = window.location.origin;
+        document.getElementById('baseUrl').textContent = baseUrl;
+        document.getElementById('curlBaseUrl').textContent = baseUrl;
+        document.getElementById('curlBaseUrl2').textContent = baseUrl;
+
+        // Función para probar endpoints
+        async function testEndpoint(method, endpoint, body, responseId) {
+            const responseDiv = document.getElementById(responseId);
+            responseDiv.style.display = 'block';
+            responseDiv.innerHTML = '⏳ Cargando...';
+
+            try {
+                const options = {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                };
+
+                if (body) {
+                    options.body = JSON.stringify(body);
+                }
+
+                const response = await fetch(baseUrl + endpoint, options);
+                const data = await response.json();
+
+                responseDiv.innerHTML = `
+                    <strong>Status:</strong> ${response.status} ${response.statusText}<br>
+                    <strong>Response:</strong><br>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                responseDiv.innerHTML = `
+                    <strong>Error:</strong> ${error.message}
+                `;
+            }
+        }
+
+        // Probar lugar por ID
+        function testPlaceById() {
+            const id = document.getElementById('placeId').value;
+            if (!id) {
+                alert('Por favor ingresa un ID');
+                return;
+            }
+            testEndpoint('GET', `/api/places/${id}`, null, 'response3');
+        }
+
+        // Probar disponibilidad
+        function testAvailability() {
+            const id = document.getElementById('availabilityPlaceId').value;
+            if (!id) {
+                alert('Por favor ingresa un ID');
+                return;
+            }
+            testEndpoint('GET', `/api/places/${id}/availability`, null, 'response4');
+        }
+
+        // Mostrar formulario de crear reserva
+        function showCreateReservationForm() {
+            const form = document.getElementById('createReservationForm');
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // Probar crear reserva
+        function testCreateReservation() {
+            try {
+                const jsonText = document.getElementById('reservationJson').value;
+                const body = JSON.parse(jsonText);
+                testEndpoint('POST', '/api/reservations', body, 'response6');
+            } catch (error) {
+                document.getElementById('response6').style.display = 'block';
+                document.getElementById('response6').innerHTML = `
+                    <strong>Error en JSON:</strong> ${error.message}
+                `;
+            }
+        }
+    </script>
+}
