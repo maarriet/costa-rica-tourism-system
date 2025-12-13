@@ -209,7 +209,7 @@ namespace Sistema_GuiaLocal_Turismo.Controllers
             return View(viewModel);
         }
 
-        // POST: Categories/Delete/5
+        // GET: Categories/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -239,7 +239,6 @@ namespace Sistema_GuiaLocal_Turismo.Controllers
                 ReservationCount = 0, // Calcular si tienes reservas
                 Revenue = 0, // Calcular si tienes ingresos
 
-                // CAMBIAR ESTA LÍNEA:
                 Places = category.Places.Select(p => new PlaceViewModel
                 {
                     Id = p.Id,
@@ -257,9 +256,10 @@ namespace Sistema_GuiaLocal_Turismo.Controllers
             return View(viewModel);
         }
 
-        [HttpPost]
+        // POST: Categories/Delete/5
+        [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var category = await _context.Categories
                 .Include(c => c.Places)
@@ -267,20 +267,22 @@ namespace Sistema_GuiaLocal_Turismo.Controllers
 
             if (category == null)
             {
-                return Json(new { success = false, message = "Categoría no encontrada" });
+                TempData["Error"] = "Categoría no encontrada";
+                return RedirectToAction(nameof(Index));
             }
 
             if (category.Places.Any())
             {
-                return Json(new { success = false, message = "No se puede eliminar la categoría porque tiene lugares asociados" });
+                TempData["Error"] = "No se puede eliminar la categoría porque tiene lugares asociados";
+                return RedirectToAction(nameof(Index));
             }
 
             _context.Categories.Remove(category);
             await _context.SaveChangesAsync();
 
-            return Json(new { success = true, message = "Categoría eliminada exitosamente" });
+            TempData["Success"] = $"Categoría '{category.Name}' eliminada exitosamente";
+            return RedirectToAction(nameof(Index));
         }
-
         private bool CategoryExists(int id)
         {
             return _context.Categories.Any(e => e.Id == id);
