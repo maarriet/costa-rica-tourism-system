@@ -7,6 +7,20 @@
     <link href="~/css/styles.css" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 }
+@if (TempData["PlaceCreateErrors"] != null)
+{
+    <div class="alert alert-danger">
+        <strong>Errores:</strong> @TempData["PlaceCreateErrors"]
+    </div>
+}
+
+@if (TempData["PlaceCreateDebug"] != null)
+{
+    <div class="alert alert-info">
+        <strong>Debug:</strong> @TempData["PlaceCreateDebug"]
+    </div>
+}
+
 
 <div class="container">
     <div class="section-header">

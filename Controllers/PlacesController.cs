@@ -20,105 +20,57 @@ namespace Sistema_GuiaLocal_Turismo.Controllers
         {
             _context = context;
         }
-        public IActionResult Index(string searchTerm, int? categoryFilter, PlaceStatus? selectedStatus, int page = 1)
+        public async Task<IActionResult> Index(string searchTerm, int? categoryFilter, PlaceStatus? selectedStatus, int page = 1)
         {
-            // Datos de prueba - TEMPORAL
-            var testPlaces = new List<PlaceViewModel>
-        {
-            new PlaceViewModel
-            {
-                Id = 1,
-                Code = "HTL001",
-                Name = "Hotel Vista Mar",
-                Description = "Hermoso hotel frente al mar",
-                CategoryId = 1,
-                CategoryName = "Alojamiento",
-                Price = 120.00m,
-                Capacity = 50,
-                CurrentOccupancy = 35,
-                Location = "Guanacaste, Tamarindo",
-                Status = PlaceStatus.Available,
-                Contact = "Tel: 2653-0123",
-                CreatedDate = DateTime.Now.AddDays(-30),
-                UpdatedDate = DateTime.Now.AddDays(-5),
-                ReservationCount = 45,
-                ActiveReservations = 8,
-                TotalRevenue = 15000m,
-                MonthlyRevenue = 3500m,
-                OccupancyRate = 70.0
-            },
-            new PlaceViewModel
-            {
-                Id = 2,
-                Code = "EXP002",
-                Name = "Aventura Canopy",
-                Description = "Emocionante tour de canopy en el bosque",
-                CategoryId = 2,
-                CategoryName = "Experiencias",
-                Price = 75.00m,
-                Capacity = 20,
-                CurrentOccupancy = 15,
-                Location = "Monteverde, Puntarenas",
-                Status = PlaceStatus.Occupied,
-                Contact = "Tel: 2645-5678",
-                CreatedDate = DateTime.Now.AddDays(-45),
-                UpdatedDate = DateTime.Now.AddDays(-2),
-                ReservationCount = 89,
-                ActiveReservations = 5,
-                TotalRevenue = 8900m,
-                MonthlyRevenue = 2100m,
-                OccupancyRate = 75.0
-            },
-            new PlaceViewModel
-            {
-                Id = 3,
-                Code = "RST003",
-                Name = "Restaurante Típico La Casona",
-                Description = "Auténtica comida costarricense",
-                CategoryId = 3,
-                CategoryName = "Restaurantes",
-                Price = 25.00m,
-                Capacity = 80,
-                CurrentOccupancy = 20,
-                Location = "San José, Centro",
-                Status = PlaceStatus.Available,
-                Contact = "Tel: 2222-3456",
-                CreatedDate = DateTime.Now.AddDays(-60),
-                UpdatedDate = DateTime.Now.AddDays(-1),
-                ReservationCount = 156,
-                ActiveReservations = 12,
-                TotalRevenue = 12500m,
-                MonthlyRevenue = 2800m,
-                OccupancyRate = 25.0
-            }
-        };
-
-            var testCategories = new List<Category>
-        {
-            new Category { Id = 1, Name = "Alojamiento", Description = "Hoteles y hospedajes" },
-            new Category { Id = 2, Name = "Experiencias", Description = "Tours y actividades" },
-            new Category { Id = 3, Name = "Restaurantes", Description = "Comida y bebidas" },
-            new Category { Id = 4, Name = "Vida Nocturna", Description = "Bares y entretenimiento" }
-        };
+            // USAR DATOS REALES DE LA BASE DE DATOS
+            var query = _context.Places
+                .Include(p => p.Category)
+                .AsQueryable();
 
             // Aplicar filtros
-            var filteredPlaces = testPlaces.AsQueryable();
-
             if (!string.IsNullOrEmpty(searchTerm))
-                filteredPlaces = filteredPlaces.Where(p => p.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase));
+                query = query.Where(p => p.Name.Contains(searchTerm) || p.Description.Contains(searchTerm));
 
             if (categoryFilter.HasValue)
-                filteredPlaces = filteredPlaces.Where(p => p.CategoryId == categoryFilter.Value);
+                query = query.Where(p => p.CategoryId == categoryFilter.Value);
 
             if (selectedStatus.HasValue)
-                filteredPlaces = filteredPlaces.Where(p => p.Status == selectedStatus.Value);
+                query = query.Where(p => p.Status == selectedStatus.Value);
 
-            var places = filteredPlaces.ToList();
+            var places = await query
+                .Select(p => new PlaceViewModel
+                {
+                    Id = p.Id,
+                    Code = p.Code,
+                    Name = p.Name,
+                    Description = p.Description,
+                    CategoryId = p.CategoryId,
+                    CategoryName = p.Category.Name,
+                    CategoryIcon = p.Category.Icon,
+                    CategoryColor = p.Category.Color,
+                    Price = p.Price,
+                    Capacity = p.Capacity,
+                    Location = p.Location,
+                    Status = p.Status,
+                    Contact = "", // Si no tienes Contact en el modelo Place
+                    CreatedDate = p.CreatedDate,
+                    UpdatedDate = p.UpdatedDate,
+                    // Valores por defecto para campos calculados
+                    ReservationCount = 0,
+                    ActiveReservations = 0,
+                    CurrentOccupancy = 0,
+                    TotalRevenue = 0,
+                    MonthlyRevenue = 0,
+                    OccupancyRate = 0
+                })
+                .ToListAsync();
+
+            var categories = await _context.Categories.ToListAsync();
 
             var viewModel = new PlaceListViewModel
             {
                 Places = places,
-                Categories = testCategories,
+                Categories = categories,
                 SearchTerm = searchTerm ?? "",
                 CategoryFilter = categoryFilter,
                 SelectedStatus = selectedStatus,
@@ -130,6 +82,7 @@ namespace Sistema_GuiaLocal_Turismo.Controllers
 
             return View(viewModel);
         }
+
 
         public IActionResult Details(int id)
         {
@@ -155,17 +108,43 @@ namespace Sistema_GuiaLocal_Turismo.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(PlaceViewModel model)
         {
-            //Lineas para debug
+            // DEBUG: Verificar errores de validación
             if (!ModelState.IsValid)
             {
                 var errors = ModelState
                     .Where(x => x.Value.Errors.Count > 0)
-                    .Select(x => new { Field = x.Key, Errors = x.Value.Errors.Select(e => e.ErrorMessage) });
+                    .Select(x => $"{x.Key}: {string.Join(", ", x.Value.Errors.Select(e => e.ErrorMessage))}")
+                    .ToList();
 
-                foreach (var error in errors)
+                TempData["PlaceCreateErrors"] = string.Join(" | ", errors);
+            }
+
+            TempData["PlaceCreateDebug"] = $"Valid: {ModelState.IsValid}";
+
+            // Llenar campos automáticamente
+            if (model.CategoryId > 0)
+            {
+                var category = await _context.Categories.FindAsync(model.CategoryId);
+                if (category != null)
                 {
-                    Console.WriteLine($"Campo {error.Field}: {string.Join(", ", error.Errors)}");
+                    model.CategoryName = category.Name;
+                    model.CategoryIcon = category.Icon ?? "";
+                    model.CategoryColor = category.Color ?? "";
                 }
+            }
+
+            // FORZAR remover errores de campos problemáticos
+            if (ModelState.ContainsKey("CategoryIcon"))
+            {
+                ModelState.Remove("CategoryIcon");
+            }
+            if (ModelState.ContainsKey("CategoryColor"))
+            {
+                ModelState.Remove("CategoryColor");
+            }
+            if (ModelState.ContainsKey("CategoryName"))
+            {
+                ModelState.Remove("CategoryName");
             }
 
             if (ModelState.IsValid)
@@ -194,7 +173,6 @@ namespace Sistema_GuiaLocal_Turismo.Controllers
             ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "Id", "Name");
             return View(model);
         }
-
 
 
         public async Task<IActionResult> Edit(int? id)
