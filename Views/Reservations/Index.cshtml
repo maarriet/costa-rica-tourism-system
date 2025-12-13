@@ -104,6 +104,7 @@
                     <th>Estado</th>
                     <th>Total</th>
                     <th>Acciones</th>
+                    <th>Alertas</th>
                 </tr>
             </thead>
             <tbody>
@@ -131,13 +132,21 @@
                                     </a>
                                 </div>
                             </td>
+                            <td>
+                                <form asp-action="TestAlert" method="post" style="display: inline;">
+                                    <input type="hidden" name="reservationId" value="@reservation.Id" />
+                                    <button type="submit" class="btn btn-warning btn-sm" onclick="return confirm('¿Enviar alerta de prueba?')">
+                                        <i class="fas fa-bell"></i> Probar
+                                    </button>
+                                </form>
+                            </td>
                         </tr>
                     }
                 }
                 else
                 {
                     <tr>
-                        <td colspan="6" class="text-center">
+                        <td colspan="7" class="text-center">
                             <div class="empty-state">
                                 <i class="fas fa-calendar-check"></i>
                                 <h3>No hay reservas registradas</h3>

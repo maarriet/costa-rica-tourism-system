@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Sistema_GuiaLocal_Turismo.Data;
 using Sistema_GuiaLocal_Turismo.Models;
 using Sistema_GuiaLocal_Turismo.ViewModels;
+using Sistema_GuiaLocal_Turismo.Services;
 
 namespace Sistema_GuiaLocal_Turismo.Controllers
 {
@@ -465,6 +466,69 @@ namespace Sistema_GuiaLocal_Turismo.Controllers
                 }).ToListAsync();
 
             return View(viewModel);
+        }
+        // En ReservationsController.cs
+        [HttpPost]
+        [Authorize(Roles = "Administrador")]
+        public async Task<IActionResult> TestAlert(int reservationId)
+        {
+            var reservation = await _context.Reservations
+                .Include(r => r.Place)
+                .Include(r => r.ClientName)
+                .FirstOrDefaultAsync(r => r.Id == reservationId);
+
+            if (reservation == null)
+                return NotFound();
+
+            var emailService = HttpContext.RequestServices.GetRequiredService<IEmailService>();
+
+            var subject = "🇨🇷 Recordatorio: Tu reserva en Costa Rica es en 3 días";
+            var htmlContent = GenerateTestEmailTemplate(reservation);
+
+            try
+            {
+                await emailService.SendEmailAsync(reservation.ClientEmail, subject, htmlContent);
+                TempData["SuccessMessage"] = $"Alerta de prueba enviada a {reservation.ClientEmail}";
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Error enviando alerta: {ex.Message}";
+            }
+
+            return RedirectToAction("Index");
+        }
+
+        private string GenerateTestEmailTemplate(Reservation reservation)
+        {
+            return $@"
+        <html>
+        <body style='font-family: Arial, sans-serif;'>
+            <div style='max-width: 600px; margin: 0 auto; padding: 20px;'>
+                <h2 style='color: #00695c;'>🇨🇷 ¡Tu aventura en Costa Rica está cerca!</h2>
+                
+                <p>Hola {reservation.ClientName},</p>
+                
+                <p><strong>ESTA ES UNA PRUEBA</strong> - Te recordamos que tu reserva está programada para <strong>dentro de 3 días</strong>.</p>
+                
+                <div style='background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0;'>
+                    <h3 style='color: #00695c; margin-top: 0;'>Detalles de tu Reserva</h3>
+                    <p><strong>Código:</strong> {reservation.ReservationCode}</p>
+                    <p><strong>Lugar:</strong> {reservation.Place.Name}</p>
+                    <p><strong>Fecha de Entrada:</strong> {reservation.CheckInDate:dd/MM/yyyy}</p>
+                    <p><strong>Fecha de Salida:</strong> {reservation.CheckOutDate:dd/MM/yyyy}</p>
+                    <p><strong>Huéspedes:</strong> {reservation.NumberOfPeople}</p>
+                    <p><strong>Total:</strong> ₡{reservation.TotalAmount:N0}</p>
+                </div>
+                
+                <p>¡Esperamos que disfrutes tu experiencia! 🌴</p>
+                
+                <p style='color: #666; font-size: 12px;'>
+                    Sistema de Turismo Costa Rica - MENSAJE DE PRUEBA<br>
+                    Este es un mensaje automático, no responder.
+                </p>
+            </div>
+        </body>
+        </html>";
         }
 
         // Método corregido para lugares disponibles

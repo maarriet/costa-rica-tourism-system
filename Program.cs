@@ -75,6 +75,8 @@ builder.Services.AddAutoMapper(cfg => {
 builder.Services.AddScoped<IAlertService, AlertService>();
 builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<IPlaceService, PlaceService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddHostedService<ReservationAlertService>();
 
 builder.Services.AddControllersWithViews();
 

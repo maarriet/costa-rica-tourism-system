@@ -76,6 +76,8 @@ namespace Sistema_GuiaLocal_Turismo.Models
         [Display(Name = "Última Actualización")]
         public DateTime UpdatedDate { get; set; } = DateTime.Now;
 
+        public bool AlertSent { get; set; } = false;
+
         // Navigation Properties
         public virtual Place Place { get; set; }
         public virtual ICollection<Alert> Alerts { get; set; } = new List<Alert>();
