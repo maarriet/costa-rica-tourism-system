@@ -195,25 +195,49 @@ namespace Sistema_GuiaLocal_Turismo.Controllers
             return View(model);
         }
 
-     
 
-        public IActionResult Edit(int id)
+
+        public async Task<IActionResult> Edit(int? id)
         {
-            var place = GetTestPlace(id);
-            if (place == null)
+            if (id == null)
+            {
                 return NotFound();
+            }
 
-            // Agregar las categorías
-            ViewBag.Categories = GetTestCategories();
+            var place = await _context.Places
+                .Include(p => p.Category)
+                .FirstOrDefaultAsync(p => p.Id == id);
 
-            return View(place);
+            if (place == null)
+            {
+                return NotFound();
+            }
+
+            var viewModel = new PlaceViewModel
+            {
+                Id = place.Id,
+                Code = place.Code,
+                Name = place.Name,
+                Description = place.Description,
+                CategoryId = place.CategoryId,
+                CategoryName = place.Category?.Name,
+                Price = place.Price,
+                Capacity = place.Capacity,
+                Location = place.Location,
+                Status = place.Status,
+                CreatedDate = place.CreatedDate,
+                UpdatedDate = place.UpdatedDate
+            };
+
+            ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "Id", "Name", place.CategoryId);
+            return View(viewModel);
         }
 
+        // POST: Places/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(int id, PlaceViewModel model)
+        public async Task<IActionResult> Edit(int id, PlaceViewModel model)
         {
-            // Verificar que el ID coincida
             if (id != model.Id)
             {
                 return NotFound();
@@ -223,34 +247,56 @@ namespace Sistema_GuiaLocal_Turismo.Controllers
             {
                 try
                 {
-                    // Simular actualización exitosa
+                    var place = await _context.Places.FindAsync(id);
+                    if (place == null)
+                    {
+                        return NotFound();
+                    }
+
+                    // Actualizar campos
+                    place.Code = model.Code;
+                    place.Name = model.Name;
+                    place.Description = model.Description;
+                    place.CategoryId = model.CategoryId;
+                    place.Price = model.Price;
+                    place.Capacity = model.Capacity;
+                    place.Location = model.Location;
+                    place.Status = model.Status;
+                    place.UpdatedDate = DateTime.Now;
+
+                    _context.Update(place);
+                    await _context.SaveChangesAsync();
+
                     TempData["Success"] = $"Lugar '{model.Name}' actualizado exitosamente!";
                     return RedirectToAction(nameof(Index));
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!PlaceExists(model.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
                 }
                 catch (Exception ex)
                 {
                     TempData["Error"] = $"Error al actualizar: {ex.Message}";
                 }
             }
-            else
-            {
-                // Mostrar errores de validación
-                var errors = ModelState
-                    .Where(x => x.Value.Errors.Count > 0)
-                    .Select(x => new { Field = x.Key, Errors = x.Value.Errors.Select(e => e.ErrorMessage) });
 
-                foreach (var error in errors)
-                {
-                    TempData["Error"] += $"Campo {error.Field}: {string.Join(", ", error.Errors)} ";
-                }
-            }
-
-            // Si hay errores, recargar las categorías y volver a la vista
-            ViewBag.Categories = GetTestCategories();
+            // Si hay errores, recargar las categorías
+            ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "Id", "Name", model.CategoryId);
             return View(model);
         }
 
-        // Método helper para obtener categorías de prueba
+        // Método helper
+        private bool PlaceExists(int id)
+        {
+            return _context.Places.Any(e => e.Id == id);
+        }
         private List<SelectListItem> GetTestCategories()
         {
             return new List<SelectListItem>
